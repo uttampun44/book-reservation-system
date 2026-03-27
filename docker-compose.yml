@@ -1,0 +1,42 @@
+ # Frontend Service
+  frontend:
+    build:
+      context: ./e-commerce-frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./e-commerce-frontend/src:/app/src
+      - ./e-commerce-frontend/public:/app/public
+      - ./e-commerce-frontend/node_modules:/app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+     # Backend Service
+  backend:
+    build:
+      context: ./e-commerce-backend
+      dockerfile: Dockerfile
+    container_name: ecommerce-backend
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - MONGODB_URI=${MONGO_URI}
+
+    volumes:
+      - ./e-commerce-backend/src:/app/src
+      - /app/node_modules
+    command: npm run dev
+    depends_on:
+      - mongo
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
