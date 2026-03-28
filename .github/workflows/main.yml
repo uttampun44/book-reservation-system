@@ -6,7 +6,7 @@ on:
       - main
       - development
 
-      # jobs for backend, frontend and integrated
+# jobs for backend, frontend and integrated
 jobs:
 
   # backend
@@ -20,8 +20,8 @@ jobs:
     #   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     #   MONGO_URI: ${{ secrets.MONGO_URI }}
     #   NODE_ENV: ${{ secrets.NODE_ENV }}
-      
-      # frontend
+
+  # frontend
   frontend:
     name: Build Frontend
     uses: ./.github/workflows/frontend.yml
@@ -30,15 +30,15 @@ jobs:
       working-directory: './frontend'
     secrets: inherit
 
-      # integration
+  # integration
   integration:
-      name: Integrate Test
-      needs: [frontend, backend]
-      uses: ./.github/workflows/integration-test.yml
-      with:
-         frontend-directory: './frontend'
-         backend-directory: './backend'
-      secrets: inherit
+    name: Integrate Test
+    needs: [frontend, backend]
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      frontend-directory: './frontend'
+      backend-directory: './backend'
+    secrets: inherit
 
   # Simple success check
   check-success:
