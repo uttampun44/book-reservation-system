@@ -26,10 +26,32 @@ on:
         value: ${{ jobs.backend.outputs.status }}
 
 jobs:
-   backend:
+  backend:
     runs-on: ubuntu-latest
     outputs:
       status: ${{ steps.build.outcome }}
     defaults:
       run:
         working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm i
+      
+      - name: Run tests
+        run: npm test
+       
+      - name: Build backend
+        id: build
+        run: npm run build
