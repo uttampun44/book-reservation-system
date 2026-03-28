@@ -16,7 +16,7 @@ jobs:
     with:
       node-version: '24'
       working-directory: './backend'
-    # secrets: 
+    secrets: inherit 
     #   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
     #   MONGO_URI: ${{ secrets.MONGO_URI }}
     #   NODE_ENV: ${{ secrets.NODE_ENV }}
