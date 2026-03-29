@@ -11,22 +11,20 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
 
       - name: Install Dependencies
-        working-directory: ./backend
         run: npm install
 
       - name: Install Vercel CLI
         run: npm install -g vercel
 
       - name: Deploy to Vercel
-        working-directory: ./backend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -34,4 +32,4 @@ jobs:
         run: vercel deploy --prod --token=$VERCEL_TOKEN
 
       - name: Complete Deployment
-        run: echo "Deployment complete!"
+        run: echo "✅ Deployment complete!"
