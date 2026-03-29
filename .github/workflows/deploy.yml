@@ -8,6 +8,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Book-reservation-system
+    defaults:
+        run:
+            working-directory: ./backend
 
     steps:
       - name: Checkout Code
@@ -16,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '24'
 
       - name: Install Dependencies
         run: npm install
