@@ -1,1 +1,49 @@
+name: Book Reservation System CI/CD Pipeline
 
+on:
+  push:
+    branches:
+      - main
+      - development
+
+# jobs for backend, frontend and integrated
+jobs:
+
+  # backend
+  backend:
+    name: Build Backend
+    uses: ./.github/workflows/backend.yml
+    with:
+      node-version: '24'
+      working-directory: './backend'
+    secrets: inherit 
+    #   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+    #   MONGO_URI: ${{ secrets.MONGO_URI }}
+    #   NODE_ENV: ${{ secrets.NODE_ENV }}
+
+  # frontend
+  frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/frontend.yml
+    with:
+      node-version: '24'
+      working-directory: './frontend'
+    secrets: inherit
+
+  # integration
+  integration:
+    name: Integrate Test
+    needs: [frontend, backend]
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      frontend-directory: './frontend'
+      backend-directory: './backend'
+    secrets: inherit
+
+  # Simple success check
+  check-success:
+    name: All Builds Complete
+    needs: [integration]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ All builds passed!"

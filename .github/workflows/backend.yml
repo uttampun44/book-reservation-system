@@ -1,0 +1,57 @@
+name: Backend Build and Tests
+
+on:
+  workflow_call:  # This makes it reusable
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '24'
+      working-directory:
+        description: 'Working directory for backend'
+        required: false
+        type: string
+        default: './backend'
+    # secrets:
+    #   JWT_SECRET_KEY:
+    #     required: true
+    #   MONGO_URI:
+    #     required: true
+    #   NODE_ENV:
+    #     required: true
+    outputs:
+      build-status:
+        description: "Build status"
+        value: ${{ jobs.backend.outputs.status }}
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.build.outcome }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          check-latest: true
+          cache: 'npm'
+          cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm i
+      
+      # - name: Run tests
+      #   run: npm test
+       
+      - name: Build backend
+        id: build
+        run: npm run build

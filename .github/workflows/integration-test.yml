@@ -1,0 +1,59 @@
+name: Integration Tests
+
+on:
+  workflow_call:
+    inputs:
+      backend-directory:
+        required: false
+        type: string
+        default: './e-commerce-backend'
+      frontend-directory:
+        required: false
+        type: string
+        default: './e-commerce-frontend'
+    # secrets:
+    #   JWT_SECRET_KEY:
+    #     required: true
+    #   FRONTEND_ENV:
+    #     required: true
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          check-latest: true
+
+    #   - name: Setup Frontend
+    #     working-directory: ${{ inputs.frontend-directory }}
+    #     run: |
+    #       # echo "${{ secrets.FRONTEND_ENV }}" > .env
+    #        echo "${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" > .env
+    #       npm i
+    #       npm run build
+          
+    #   - name: Setup Backend
+    #     working-directory: ${{ inputs.backend-directory }}
+    #     run: |
+    #       echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
+    #       echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
+    #       echo "MONGODB_URI=${{ secrets.MONGO_URI }}" >> .env
+    #       echo "PORT=8080" >> .env
+    #       npm i
+
+      - name: Start Backend Server
+        working-directory: ${{ inputs.backend-directory }}
+        run: |
+          npm run dev &
+          sleep 10
+
+      - name: Cleanup
+        if: always()
+        run: pkill -f "npm start" || true
