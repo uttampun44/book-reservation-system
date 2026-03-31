@@ -25,7 +25,7 @@ function App() {
           className="counter"
           onClick={() => setCount((count) => count + 1)}
         >
-          Count is reactjs {count}
+          Count is CI/CD {count}
         </button>
       </section>
 

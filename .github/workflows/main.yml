@@ -47,3 +47,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "✅ All builds passed!"
+
+  # Backend deployment
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: check-success
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Backend to Vercel
+        run: |
+          npm install -g vercel
+          cd ./backend
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  # Frontend deployment
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Frontend to Vercel
+        run: |
+          npm install -g vercel
+          cd ./frontend
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_FRONTEND_PROJECT_ID }}
