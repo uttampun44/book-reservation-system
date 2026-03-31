@@ -1,24 +1,37 @@
-name: Integration Tests
+name: Integration Tests and Deployment
 
 on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
   workflow_call:
     inputs:
       backend-directory:
         required: false
         type: string
-        default: './e-commerce-backend'
+        default: './backend'
       frontend-directory:
         required: false
         type: string
-        default: './e-commerce-frontend'
-    # secrets:
-    #   JWT_SECRET_KEY:
-    #     required: true
-    #   FRONTEND_ENV:
-    #     required: true
+        default: './frontend'
+    secrets:
+      VERCEL_TOKEN:
+        required: false
+      VERCEL_ORG_ID:
+        required: false
+      VERCEL_PROJECT_ID_BACKEND:
+        required: false
+      VERCEL_PROJECT_ID_FRONTEND:
+        required: false
 
 jobs:
-  integration-test:
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -31,29 +44,64 @@ jobs:
           node-version: '24'
           check-latest: true
 
-    #   - name: Setup Frontend
-    #     working-directory: ${{ inputs.frontend-directory }}
-    #     run: |
-    #       # echo "${{ secrets.FRONTEND_ENV }}" > .env
-    #        echo "${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" > .env
-    #       npm i
-    #       npm run build
-          
-    #   - name: Setup Backend
-    #     working-directory: ${{ inputs.backend-directory }}
-    #     run: |
-    #       echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" > .env
-    #       echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-    #       echo "MONGODB_URI=${{ secrets.MONGO_URI }}" >> .env
-    #       echo "PORT=8080" >> .env
-    #       npm i
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
 
-      - name: Start Backend Server
-        working-directory: ${{ inputs.backend-directory }}
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Backend to Vercel
         run: |
-          npm run dev &
-          sleep 10
+          npm install -g vercel
+          cd ./backend
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Cleanup
-        if: always()
-        run: pkill -f "npm start" || true
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Frontend to Vercel
+        run: |
+          npm install -g vercel
+          cd ./frontend
+          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FRONTEND }}
