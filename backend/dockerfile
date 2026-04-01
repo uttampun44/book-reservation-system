@@ -18,5 +18,5 @@ COPY . .
 # Expose Vite dev server port
 EXPOSE 8000
  
-# Run Vite in dev mode, accessible outside the container
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Run tsx watch in dev mode
+CMD ["npm", "run", "dev"]
