@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsup src/app.ts --format esm --out-dir dist --external mongoose --external dotenv",
+    "build": "tsup src/app.ts --format esm --out-dir dist --dts",
     "start": "node dist/app.js",
     "test": "vitest run",
     "vercel-build": "npm run build"
@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
