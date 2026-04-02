@@ -1,19 +1,17 @@
 {
-  "version": 2,
+"version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install --include=dev",
-   "builds": [
-    {
-      "src": "dist/app.js",
-      "use": "@vercel/node"
+  "installCommand": "npm install",
+  "functions": {
+    "dist/app.js": {
+      "memory": 1024,
+      "maxDuration": 10
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
       "dest": "dist/app.js"
-      
     }
   ],
   "git":{
