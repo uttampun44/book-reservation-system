@@ -2,16 +2,11 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "functions": {
-    "dist/app.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
+  "outputDirectory": "dist",
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/server.js"
+      "dest": "dist/app.js"
     }
   ],
   "git":{
