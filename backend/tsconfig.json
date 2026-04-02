@@ -48,7 +48,9 @@
       "@controllers/*": ["src/controllers/*"],
       "@middlewares/*": ["src/middlewares/*"],
       "@lib/*": ["src/lib/*"],
-      "@models/*": ["src/models/*"]
+      "@models/*": ["src/models/*"],
+      "@schema/*": ["src/schema/*"],
+      "@types/*": ["src/types/*"]
     },
   },
   

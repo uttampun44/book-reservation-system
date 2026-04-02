@@ -1,10 +1,13 @@
-import type { userTypes } from "@/schema/types/User.type";
+import type { userTypes } from "@schema/types/User.type";
 import mongoose, { Schema, Document } from "mongoose";
 import z from "zod";
 
 type UserType = z.infer<typeof userTypes>;
 
 export interface IUser extends Document, UserType {
+    fullname: string;
+    email: string;
+    password: string;
     createdAt: Date;
     updatedAt: Date;
 }
