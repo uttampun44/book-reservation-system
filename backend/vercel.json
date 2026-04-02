@@ -1,17 +1,12 @@
 {
-"version": 2,
+  "version": 2,
   "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "functions": {
-    "dist/app.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
+  "installCommand": "npm install --include=dev",
+ 
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/app.js"
+      "dest": "dist/server.js"
     }
   ],
   "git":{
