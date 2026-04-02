@@ -18,7 +18,7 @@ jobs:
       working-directory: './backend'
     secrets: inherit 
     #   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-    #   MONGO_URI: ${{ secrets.MONGO_URI }}
+    #   MONGO_URI: ${{ secrets.VERCEL_MONGO_URI }}
     #   NODE_ENV: ${{ secrets.NODE_ENV }}
 
   # frontend
