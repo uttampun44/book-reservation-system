@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/server.js",
+  "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsup src/app.ts --format esm --out-dir dist && tsc-alias -p tsconfig.json",
+    "build": "npx tsup src/app.ts --format esm --out-dir dist --dts && npx tsc-alias -p tsconfig.json",
     "start": "node dist/app.js",
     "test": "vitest run",
     "vercel-build": "npm run build"
