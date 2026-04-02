@@ -10,20 +10,10 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
 
   return (
     <>
-      <nav
-        className="sticky top-0 z-50 flex items-center justify-between px-6 py-4"
-        style={{
-          background: "rgba(245,244,240,0.92)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(0,0,0,0.07)",
-        }}
-      >
-        {/* Logo */}
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-[#f5f4f0]/90 backdrop-blur-md border-b border-black/10">
+        
         <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: "#1a2e1a" }}
-          >
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-[#1a2e1a]">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" strokeWidth="2.5">
               <path
                 strokeLinecap="round"
@@ -32,26 +22,18 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
               />
             </svg>
           </div>
-          <span
-            className="font-bold text-lg tracking-tight"
-            style={{ color: "#1a2e1a", fontFamily: "'Lora', serif" }}
-          >
+          <span className="font-bold text-lg tracking-tight text-[#1a2e1a] font-[Lora]">
             BookLib
           </span>
         </div>
 
-        {/* Desktop search bar */}
-        <div
-          className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 max-w-md mx-8"
-          style={{ background: "#ece9e2", border: "1.5px solid rgba(0,0,0,0.08)" }}
-        >
+        <div className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 max-w-md mx-8 bg-[#ece9e2] border border-black/10">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2">
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" strokeLinecap="round" />
           </svg>
           <input
-            className="flex-1 bg-transparent outline-none text-sm placeholder-gray-400"
-            style={{ color: "#1a2e1a" }}
+            className="flex-1 bg-transparent outline-none text-sm text-[#1a2e1a] placeholder-gray-400"
             placeholder="Search title, author, ISBN..."
             value={searchValue}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -66,29 +48,15 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
           )}
         </div>
 
-        {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-6">
-          {/* <button
-            className="text-sm font-medium hover:opacity-70 transition-opacity"
-            style={{ color: "#1a2e1a" }}
-          >
-            Browse
-          </button> */}
-          <button
-            className="text-sm font-medium hover:opacity-70 transition-opacity"
-            style={{ color: "#1a2e1a" }}
-          >
+          <button className="text-sm font-medium text-[#1a2e1a] hover:opacity-70 transition-opacity">
             My Books
           </button>
-          <button
-            className="px-5 py-2 rounded-full text-sm font-bold transition-all hover:opacity-90 active:scale-95"
-            style={{ background: "#c9a84c", color: "#fff" }}
-          >
+          <button className="px-5 py-2 rounded-full text-sm font-bold bg-[#c9a84c] text-white hover:opacity-90 active:scale-95 transition-all">
             Sign up
           </button>
         </div>
 
-        {/* Mobile hamburger */}
         <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
           <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#1a2e1a" strokeWidth="2">
             <path strokeLinecap="round" d="M4 6h16M4 12h16M4 18h16" />
@@ -96,16 +64,10 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
         </button>
       </nav>
 
-      {/* Mobile dropdown */}
       {mobileOpen && (
-        <div
-          className="md:hidden px-6 py-4 flex flex-col gap-3"
-          style={{ background: "#ece9e2", borderBottom: "1px solid rgba(0,0,0,0.08)" }}
-        >
-          <div
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full"
-            style={{ background: "#fff" }}
-          >
+        <div className="md:hidden px-6 py-4 flex flex-col gap-3 bg-[#ece9e2] border-b border-black/10">
+          
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.35-4.35" strokeLinecap="round" />
@@ -117,13 +79,11 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
               onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
-          <div className="flex gap-4 text-sm font-medium" style={{ color: "#1a2e1a" }}>
+
+          <div className="flex gap-4 text-sm font-medium text-[#1a2e1a]">
             <button>Browse</button>
             <button>My Books</button>
-            <button
-              className="ml-auto px-4 py-1.5 rounded-full font-bold text-white"
-              style={{ background: "#c9a84c" }}
-            >
+            <button className="ml-auto px-4 py-1.5 rounded-full font-bold text-white bg-[#c9a84c]">
               Sign up
             </button>
           </div>

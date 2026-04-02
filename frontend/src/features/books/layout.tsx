@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../../components/layout/Navbar";
-import { HeroSection } from "./pages/HeroSection";
+import {HeroSection} from "./pages/HeroSection"; 
 
 const BookListPage: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -10,18 +10,8 @@ const BookListPage: React.FC = () => {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: "#f5f4f0",
-        fontFamily: "'Inter', sans-serif",
-      }}
-    >
-      {/* Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
-      `}</style>
-
+    <div className="min-h-screen bg-[#f5f4f0] font-[Inter]">
+      
       {/* Navbar */}
       <Navbar
         searchValue={search}
