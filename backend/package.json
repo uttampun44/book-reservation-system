@@ -5,9 +5,10 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsup src/app.ts --format esm --out-dir dist --external mongoose",
+    "build": "tsup src/app.ts --format esm --out-dir dist --external mongoose --external dotenv",
     "start": "node dist/app.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "vercel-build": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +19,6 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
-    "dotenv": "^17.4.0",
     "eslint": "^10.1.0",
     "install": "^0.13.0",
     "nodemon": "^3.1.14",
@@ -34,6 +34,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "chalk": "^5.6.2",
+    "dotenv": "^17.4.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",

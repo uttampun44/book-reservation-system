@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express, {type Express} from "express";
 import chalk from "chalk";
 import Routes from "@routes/Routes";
