@@ -6,6 +6,7 @@ import { HeroSection } from "./pages/HeroSection";
 import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
+import type { Book, Pagination } from "./types/book";
 
 const App: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -15,11 +16,10 @@ const App: React.FC = () => {
     const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
     const [perPage, setPerPage] = useState(Number(searchParams.get("perPage")) || ITEMS_PER_PAGE);
 
-    // ✅ NEW: API state
-    const [books, setBooks] = useState<any[]>([]);
+    const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pagination, setPagination] = useState<any>(null);
+    const [pagination, setPagination] = useState<Pagination | null>(null);
 
     const updateUrlParams = useCallback((newPage: number, newPerPage: number) => {
         setSearchParams({ page: String(newPage), perPage: String(newPerPage) });

@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { BookListResponse } from "../types/book";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -11,7 +12,7 @@ export const api = axios.create({
 
 console.log("API URL:", import.meta.env.VITE_BACKEND_URL);
 
-export const getBooks = async (page: number = 1, perPage: number = 6) => {
+export const getBooks = async (page: number = 1, perPage: number = 6): Promise<BookListResponse> => {
   const response = await api.get("/api/v1/books", {
     params: { page, perPage }
   });

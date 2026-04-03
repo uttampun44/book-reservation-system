@@ -24,6 +24,7 @@ const inStockBook: Book = {
   description: "A classic novel.",
   tags: ["classic"],
   inStock: true,
+  available: 5,
   featured: false,
 };
 
@@ -32,6 +33,7 @@ const outOfStockBook: Book = {
   id: "2",
   title: "Dune",
   inStock: false,
+  available: 0,
 };
 
 describe("BookCard", () => {

@@ -25,6 +25,7 @@ export interface Book {
   description: string;
   tags: string[];
   inStock: boolean;
+  available: number;
   featured: boolean;
 }
 

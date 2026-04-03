@@ -25,6 +25,7 @@ const mockBooks: Book[] = [
     description: "A classic novel set in the Roaring Twenties.",
     tags: ["classic", "jazz age"],
     inStock: true,
+    available: 5,
     featured: false,
   },
   {
@@ -48,6 +49,7 @@ const mockBooks: Book[] = [
     description: "A science fiction masterpiece.",
     tags: ["sci-fi", "space opera"],
     inStock: false,
+    available: 0,
     featured: true,
   },
 ];
