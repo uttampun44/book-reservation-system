@@ -1,11 +1,11 @@
 import React from "react";
 
-interface HeroProps {
-  searchValue: string;
-  onSearchChange: (val: string) => void;
-}
+// interface HeroProps {
+//   searchValue: string;
+//   onSearchChange: (val: string) => void;
+// }
 
-export const HeroSection: React.FC<HeroProps> = () => {
+export const HeroSection: React.FC = () => {
   return (
     <header className="relative overflow-hidden px-6 py-16 text-center bg-[linear-gradient(160deg,#1a2e1a_0%,#2d4a2d_60%,#3a5a3a_100%)]">
       
