@@ -1,5 +1,5 @@
 import React from "react";
-import { GENRES, SORT_OPTIONS, PER_PAGE_OPTIONS } from "../types";
+import { GENRES, SORT_OPTIONS} from "../types";
 
 interface FilterBarProps {
   activeGenre: string;
@@ -13,14 +13,12 @@ interface FilterBarProps {
 const FilterBar: React.FC<FilterBarProps> = ({
   activeGenre,
   sortBy,
-  perPage,
   onGenreChange,
   onSortChange,
-  onPerPageChange,
 }) => {
   return (
     <div
-      className="sticky top-[65px] z-40 px-6 py-3 flex items-center gap-3 overflow-x-auto"
+      className="sticky top-[65px] z-40 px-6 py-6 flex items-center gap-3 overflow-x-auto"
       style={{
         background: "rgba(245,244,240,0.95)",
         backdropFilter: "blur(8px)",
@@ -69,25 +67,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
           ))}
         </select>
 
-        <select
-          className="text-sm font-medium px-3 py-1.5 rounded-xl outline-none appearance-none cursor-pointer"
-          style={{
-            background: "#fff",
-            color: "#1a2e1a",
-            border: "1.5px solid rgba(0,0,0,0.1)",
-          }}
-          value={perPage}
-          onChange={(e) => onPerPageChange(Number(e.target.value))}
-        >
-          <option value="" disabled hidden>
-            domain
-          </option>
-          {PER_PAGE_OPTIONS.map((option) => (
-            <option key={option} value={option}>
-              perpage ({option})
-            </option>
-          ))}
-        </select>
       </div>
     </div>
   );

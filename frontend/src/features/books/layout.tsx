@@ -50,8 +50,7 @@ const App: React.FC = () => {
         const fetchBooks = async () => {
             try {
                 const data = await getBooks(page, perPage);
-                console.log("Fetched books:--------", data);
-
+               
                 setBooks(data.data);
                 setPagination(data.pagination);
             } catch (err) {
