@@ -46,10 +46,11 @@
       "@routes/*": ["src/routes/*"],
       "@controllers/*": ["src/controllers/*"],
       "@middlewares/*": ["src/middlewares/*"],
-      "@lib/*": ["src/lib/*"],
+      "@lib/*": ["src/utils/*"],
       "@models/*": ["src/models/*"],
       "@schema/*": ["src/schema/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+        "@utils/*": ["src/utils/*"]
     },
   },
   
