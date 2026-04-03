@@ -1,11 +1,13 @@
 import React from "react";
-import { GENRES, SORT_OPTIONS } from "../types";
+import { GENRES, SORT_OPTIONS} from "../types";
 
 interface FilterBarProps {
   activeGenre: string;
   sortBy: string;
+  perPage: number;
   onGenreChange: (genre: string) => void;
   onSortChange: (sort: string) => void;
+  onPerPageChange: (perPage: number) => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -16,7 +18,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
 }) => {
   return (
     <div
-      className="sticky top-[65px] z-40 px-6 py-3 flex items-center gap-3 overflow-x-auto"
+      className="sticky top-[65px] z-40 px-6 py-6 flex items-center gap-3 overflow-x-auto"
       style={{
         background: "rgba(245,244,240,0.95)",
         backdropFilter: "blur(8px)",
@@ -47,7 +49,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </button>
       ))}
 
-      <div className="ml-auto shrink-0">
+      <div className="ml-auto shrink-0 flex gap-3">
         <select
           className="text-sm font-medium px-3 py-1.5 rounded-xl outline-none appearance-none cursor-pointer"
           style={{
@@ -64,6 +66,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             </option>
           ))}
         </select>
+
       </div>
     </div>
   );

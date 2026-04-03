@@ -6,6 +6,10 @@ import BookListPage from "../features/books/layout";
 
 export const router = createBrowserRouter([
   {
+    path: "/books",
+    element: <BookListPage />,
+  },
+  {
     path: "/",
     element: <BookListPage />,
   },
