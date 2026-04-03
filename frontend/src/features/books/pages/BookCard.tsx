@@ -46,7 +46,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         border: "1px solid rgba(0,0,0,0.06)",
       }}
     >
-      {/* Book Cover */}
       <div
         className="relative h-48 flex items-center justify-center overflow-hidden"
         style={{
@@ -57,7 +56,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           <AvailabilityBadge book={book} />
         </div>
 
-        {/* Stylised cover art */}
         <div className="flex flex-col items-center justify-center gap-1 px-6 text-center select-none">
           <div
             className="w-8 h-0.5 rounded-full mb-2"
