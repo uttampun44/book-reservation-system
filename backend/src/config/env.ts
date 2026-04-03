@@ -1,4 +1,10 @@
 
+
+import dotenv from "dotenv";
+
+// Environment variables configuration
+dotenv.config();
+
 export const configEnv = {
   port: process.env.PORT || 8000,
   mongoURI: process.env.VERCEL_MONGO_URI || "mongodb://localhost:27017/book",
