@@ -1,10 +1,12 @@
-import "dotenv/config";
+import dotenv from "dotenv";;
+dotenv.config();
 import express, { type Express } from "express";
 import chalk from "chalk";
 import Routes from "@routes/Routes";
 import { corsOptions } from "@config/cors";
 import Cors from "cors";
 import connectDB from "@config/database";
+
 
 export const app: Express = express();
 

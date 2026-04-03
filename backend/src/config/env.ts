@@ -1,8 +1,5 @@
 import dotenv from "dotenv";
-
-// Environment variables configuration
 dotenv.config();
-
 
 export const configEnv = {
   port: process.env.PORT || 8000,
