@@ -1,18 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "src/app.ts",
-      "use": "@vercel/node",
-      "config":{
-        "includeFiles": ["src/**"]
-      }
-    }
-  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --production=false",
+  "outputDirectory": "dist",
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/app.ts"
+      "dest": "dist/app.js"
     }
   ],
   "git":{

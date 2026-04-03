@@ -30,10 +30,12 @@ services:
     container_name: book-reservation-backend
     ports:
       - "${PORT:-8000}:8000"
+    env_file:
+      - ./backend/.env
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - PORT=${PORT:-8000}
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=mongodb://mongo:27017/book
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./backend/src:/app/src
@@ -43,6 +45,21 @@ services:
     networks:
       - book-reservation-network
     restart: unless-stopped
+
+ # MongoDB database Service 
+  mongo:
+    image: mongo:latest
+    container_name: book-reservation-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db                        
+    networks:
+      - book-reservation-network
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
 
 networks:
   book-reservation-network:

@@ -8,7 +8,7 @@ frontend/.env.*.local
 
 # backend gitignore
 backend/node_modules/
-backend/dist/
+# backend/dist/
 backend/.env
 backend/.env.local
 backend/.env.*.local
