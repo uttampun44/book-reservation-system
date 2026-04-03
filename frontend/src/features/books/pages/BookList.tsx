@@ -1,6 +1,6 @@
 import React from "react";
 import type { Book } from "../types/book";
-import BookCard from "./bookCard";
+import BookCard from "./BookCard";
 
 interface BookGridProps {
   books: Book[];
@@ -28,7 +28,6 @@ const BookGrid: React.FC<BookGridProps> = ({ books, totalCount, searchQuery }) =
 
   return (
     <>
-      {/* Section header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2

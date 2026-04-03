@@ -26,7 +26,7 @@ const App: React.FC = () => {
         setPage(1);
     };
 
-    // Filter & sort
+    // (Filter & sort)
     const filteredBooks = useMemo(() => {
         return BOOKS.filter((book) => {
             const matchesSearch =
@@ -53,7 +53,6 @@ const App: React.FC = () => {
 
     return (
         <div className="min-h-screen" style={{ background: "#f5f4f0", fontFamily: "'Inter', sans-serif" }}>
-            {/* Google Fonts */}
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; }
@@ -80,7 +79,48 @@ const App: React.FC = () => {
                     searchQuery={search}
                 />
 
+                {totalPages > 1 && (
+                    <div className="mt-12 flex justify-center items-center gap-2">
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            className={`px-4 py-2 border rounded-md font-medium transition-colors ${
+                                page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e8e6df]'
+                            }`}
+                            style={{ borderColor: "#c8c4b8", color: "#1a2e1a" }}
+                        >
+                            Previous
+                        </button>
+                        
+                        <div className="flex gap-1 mx-2">
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setPage(i + 1)}
+                                    className={`w-10 h-10 rounded-md font-medium transition-colors`}
+                                    style={{
+                                        backgroundColor: page === i + 1 ? "#1a2e1a" : "transparent",
+                                        color: page === i + 1 ? "#fff" : "#1a2e1a",
+                                        border: page === i + 1 ? "none" : "1px solid #c8c4b8"
+                                    }}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
 
+                        <button
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            className={`px-4 py-2 border rounded-md font-medium transition-colors ${
+                                page === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e8e6df]'
+                            }`}
+                            style={{ borderColor: "#c8c4b8", color: "#1a2e1a" }}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </main>
 
         </div>

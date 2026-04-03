@@ -47,7 +47,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </button>
       ))}
 
-      {/* Sort dropdown — pushed to the right */}
       <div className="ml-auto shrink-0">
         <select
           className="text-sm font-medium px-3 py-1.5 rounded-xl outline-none appearance-none cursor-pointer"

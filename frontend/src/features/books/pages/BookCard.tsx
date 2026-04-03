@@ -76,7 +76,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         </div>
       </div>
 
-      {/* Card body */}
       <div className="p-4 flex flex-col flex-1 gap-2">
         <div>
           <h3
