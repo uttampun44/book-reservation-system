@@ -8,33 +8,25 @@ interface BookCardProps {
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const [reserved, setReserved] = useState(false);
-  const [waitlisted, setWaitlisted] = useState(false);
 
-  const canReserve = book.available > 0;
-  const isOut = !canReserve && !book.waitlist;
+  const canReserve = book.inStock;
+  const isOut = !canReserve;
 
   const handleAction = () => {
     if (isOut) return;
-    if (canReserve) setReserved(true);
-    else setWaitlisted(true);
+    setReserved(true);
   };
 
   const getButtonStyle = (): React.CSSProperties => {
     if (isOut) return { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" };
-    if (canReserve) {
-      return reserved
-        ? { background: "#2d6a4f22", color: "#2d6a4f", border: "1.5px solid #2d6a4f55" }
-        : { background: "#1a2e1a", color: "#fff", cursor: "pointer" };
-    }
-    return waitlisted
-      ? { background: "#f5eedc", color: "#b48c1e", border: "1.5px solid #c9a84c55" }
-      : { background: "#f5eedc", color: "#8b6500", border: "1.5px solid #c9a84c66", cursor: "pointer" };
+    return reserved
+      ? { background: "#2d6a4f22", color: "#2d6a4f", border: "1.5px solid #2d6a4f55" }
+      : { background: "#1a2e1a", color: "#fff", cursor: "pointer" };
   };
 
   const getButtonLabel = (): string => {
     if (isOut) return "Unavailable";
-    if (canReserve) return reserved ? "✓ Reserved" : "Reserve";
-    return waitlisted ? "✓ On Waitlist" : "Join Waitlist";
+    return reserved ? "✓ Reserved" : "Reserve";
   };
 
   return (
@@ -49,28 +41,18 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
       <div
         className="relative h-48 flex items-center justify-center overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${book.cover} 0%, ${book.coverAccent}55 100%)`,
+          backgroundColor: book.coverColor || "#1a2e1a",
         }}
       >
-        <div className="absolute top-2.5 left-2.5">
-          <AvailabilityBadge book={book} />
-        </div>
+        <img
+          src={book.coverImage?.large || book.imageUrl}
+          alt={book.title}
+          className="absolute inset-0 w-full h-full object-cover opacity-95 transition-opacity hover:opacity-100"
+        />
+        <div className="absolute inset-0 bg-black/10" />
 
-        <div className="flex flex-col items-center justify-center gap-1 px-6 text-center select-none">
-          <div
-            className="w-8 h-0.5 rounded-full mb-2"
-            style={{ background: book.coverAccent + "99" }}
-          />
-          <span
-            className="text-xs font-bold tracking-widest uppercase opacity-60"
-            style={{ color: book.coverAccent }}
-          >
-            {book.genre}
-          </span>
-          <div
-            className="w-12 h-0.5 rounded-full mt-2"
-            style={{ background: book.coverAccent + "55" }}
-          />
+        <div className="absolute top-2.5 left-2.5 z-10">
+          <AvailabilityBadge book={book} />
         </div>
       </div>
 
@@ -93,6 +75,9 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             style={{ background: "rgba(26,46,26,0.07)", color: "#3a5a3a" }}
           >
             {book.genre}
+          </span>
+          <span className="text-sm font-bold" style={{ color: "#1a2e1a" }}>
+            ${book.price}
           </span>
         </div>
 
