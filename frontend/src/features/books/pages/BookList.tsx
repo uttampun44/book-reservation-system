@@ -43,7 +43,6 @@ const BookGrid: React.FC<BookGridProps> = ({ books, totalCount, searchQuery }) =
        
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {books.map((book) => (
           <BookCard key={book.id} book={book} />
