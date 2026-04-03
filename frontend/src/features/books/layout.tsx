@@ -14,7 +14,7 @@ const App: React.FC = () => {
     const [sortBy, setSortBy] = useState("Most Popular");
     const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
     const [perPage, setPerPage] = useState(Number(searchParams.get("perPage")) || ITEMS_PER_PAGE);
-    
+
     // ✅ NEW: API state
     const [books, setBooks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ const App: React.FC = () => {
         fetchBooks();
     }, [page, perPage]);
 
-    // (Filter & sort) — ONLY change: BOOKS → books
+    // (Filter & sort) 
     const filteredBooks = useMemo(() => {
         return books?.filter((book) => {
             const matchesSearch =
@@ -86,12 +86,10 @@ const App: React.FC = () => {
         });
     }, [books, search, activeGenre, sortBy]);
 
-    // Use API pagination data instead of calculating locally
     const totalPages = pagination?.totalPages || 1;
     const hasNextPage = pagination?.hasNextPage || false;
     const hasPrevPage = pagination?.hasPrevPage || false;
 
-    // ✅ NEW: loading UI (no design change)
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -100,7 +98,6 @@ const App: React.FC = () => {
         );
     }
 
-    // ✅ NEW: error UI
     if (error) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -125,8 +122,6 @@ const App: React.FC = () => {
             <Navbar searchValue={search} onSearchChange={handleSearchChange} />
 
             <HeroSection
-                searchValue={search}
-                onSearchChange={handleSearchChange}
             />
 
             <FilterBar
