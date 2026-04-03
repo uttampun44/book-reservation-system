@@ -45,7 +45,6 @@ const App: React.FC = () => {
         setPage(1);
     };
 
-    // ✅ NEW: Fetch books from API
     useEffect(() => {
         const fetchBooks = async () => {
             try {
