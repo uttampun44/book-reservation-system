@@ -16,7 +16,6 @@ import { corsOptions } from "@config/cors";
 import Cors from "cors";
 import connectDB from "@config/database";
 
-console.log("MONGO URI:", process.env.VERCEL_MONGO_URI);
 export const app: Express = express();
 
 const Port = process.env.PORT || 8080;
