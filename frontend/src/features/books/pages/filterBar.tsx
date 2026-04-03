@@ -1,18 +1,22 @@
 import React from "react";
-import { GENRES, SORT_OPTIONS } from "../types";
+import { GENRES, SORT_OPTIONS, PER_PAGE_OPTIONS } from "../types";
 
 interface FilterBarProps {
   activeGenre: string;
   sortBy: string;
+  perPage: number;
   onGenreChange: (genre: string) => void;
   onSortChange: (sort: string) => void;
+  onPerPageChange: (perPage: number) => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
   activeGenre,
   sortBy,
+  perPage,
   onGenreChange,
   onSortChange,
+  onPerPageChange,
 }) => {
   return (
     <div
@@ -47,7 +51,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         </button>
       ))}
 
-      <div className="ml-auto shrink-0">
+      <div className="ml-auto shrink-0 flex gap-3">
         <select
           className="text-sm font-medium px-3 py-1.5 rounded-xl outline-none appearance-none cursor-pointer"
           style={{
@@ -61,6 +65,26 @@ const FilterBar: React.FC<FilterBarProps> = ({
           {SORT_OPTIONS.map((option) => (
             <option key={option} value={option}>
               {option}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="text-sm font-medium px-3 py-1.5 rounded-xl outline-none appearance-none cursor-pointer"
+          style={{
+            background: "#fff",
+            color: "#1a2e1a",
+            border: "1.5px solid rgba(0,0,0,0.1)",
+          }}
+          value={perPage}
+          onChange={(e) => onPerPageChange(Number(e.target.value))}
+        >
+          <option value="" disabled hidden>
+            domain
+          </option>
+          {PER_PAGE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              perpage ({option})
             </option>
           ))}
         </select>
