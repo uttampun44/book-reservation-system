@@ -175,11 +175,10 @@ jobs:
         vercel deploy ./backend \
           --token=${{ secrets.VERCEL_TOKEN }} \
           --prod --yes
-
-# backend env
+          
       env:
         VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL__PROJECT_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
   deploy-frontend-production:
     name: Deploy Frontend to Production
