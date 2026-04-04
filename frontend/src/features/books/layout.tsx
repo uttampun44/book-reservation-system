@@ -105,6 +105,8 @@ const App: React.FC = () => {
         );
     }
 
+    const safeFilteredBooks = filteredBooks ?? [];
+
     return (
         <div
             className="min-h-screen"
@@ -134,8 +136,8 @@ const App: React.FC = () => {
 
             <main className="max-w-7xl mx-auto px-6 py-10">
                 <BookGrid
-                    books={filteredBooks}
-                    totalCount={pagination?.totalItems || filteredBooks.length}
+                    books={safeFilteredBooks}
+                    totalCount={pagination?.totalItems || safeFilteredBooks.length}
                     searchQuery={search}
                 />
 
