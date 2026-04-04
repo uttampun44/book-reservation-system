@@ -119,7 +119,7 @@ jobs:
 
     - name: Test All API Routes are Live
       run: |
-        BASE_URL="${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1"
+        BASE_URL="${{ secrets.BACKEND_URL }}/api/v1"
 
         ROUTES=(
           "books",
