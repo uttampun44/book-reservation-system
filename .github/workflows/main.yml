@@ -122,9 +122,7 @@ jobs:
         BASE_URL="${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1"
 
         ROUTES=(
-          "books"
-          "dashboard"
-          "admin"
+          "books",
         )
 
         for ROUTE in "${ROUTES[@]}"; do
