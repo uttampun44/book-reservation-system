@@ -2,7 +2,7 @@ import axios from "axios";
 import type { BookListResponse } from "../types/book";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 10000,
   withCredentials: true,
   headers: {
