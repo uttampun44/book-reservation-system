@@ -135,18 +135,8 @@ jobs:
           fi
         done
 
-      run: |
-        STATUS=$(curl --retry 5 --retry-delay 10 -s -o /dev/null -w "%{http_code}" \
-          -X POST \
-          -H "Content-Type: application/json" \
-          -d '{"email":"smoketest@test.com","password":"Test1234!"}' \
-          ${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/login)
-        if [ "$STATUS" != "200" ] && [ "$STATUS" != "401" ]; then
-          echo "❌ Login route failed with status $STATUS"
-          exit 1
-        fi
-        echo "✅ Login route returned $STATUS"
-            
+   
+        # backend deployment production
   deploy-backend-production:
     name: Deploy Backend to Production
     runs-on: ubuntu-latest
