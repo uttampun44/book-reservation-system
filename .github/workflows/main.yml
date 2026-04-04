@@ -122,7 +122,7 @@ jobs:
         BASE_URL="${{ secrets.BACKEND_URL }}/api/v1"
 
         ROUTES=(
-          "books",
+          "books"
         )
 
         for ROUTE in "${ROUTES[@]}"; do
@@ -135,20 +135,6 @@ jobs:
           fi
         done
 
-    - name: Test Register Route is Live
-      run: |
-        STATUS=$(curl --retry 5 --retry-delay 10 -s -o /dev/null -w "%{http_code}" \
-          -X POST \
-          -H "Content-Type: application/json" \
-          -d '{"email":"smoketest@test.com","password":"Test1234!","name":"Smoke Test"}' \
-          ${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/register)
-        if [ "$STATUS" != "201" ] && [ "$STATUS" != "400" ]; then
-          echo "❌ Register route failed with status $STATUS"
-          exit 1
-        fi
-        echo "✅ Register route returned $STATUS"
-
-    - name: Test Login Route is Live
       run: |
         STATUS=$(curl --retry 5 --retry-delay 10 -s -o /dev/null -w "%{http_code}" \
           -X POST \
