@@ -47,8 +47,9 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const fetchBooks = async () => {
+            setLoading(true);
             try {
-                const data = await getBooks(page, perPage);
+                const data = await getBooks(page, perPage, sortBy);
                 console.log("Fetched books:--------", data);
 
                 setBooks(data.data);
@@ -62,7 +63,7 @@ const App: React.FC = () => {
         };
 
         fetchBooks();
-    }, [page, perPage]);
+    }, [page, perPage, sortBy]);
 
     // (Filter & sort) 
     const filteredBooks = useMemo(() => {
@@ -146,9 +147,11 @@ const App: React.FC = () => {
                     <div className="mt-12 flex justify-center items-center gap-2">
                         <button
                             onClick={() => {
-                                const newPage = Math.max(1, page - 1);
-                                setPage(newPage);
-                                updateUrlParams(newPage, perPage);
+                                if (hasPrevPage) {
+                                    const newPage = page - 1;
+                                    setPage(newPage);
+                                    updateUrlParams(newPage, perPage);
+                                }
                             }}
                             disabled={!hasPrevPage}
                             className={`px-4 py-2 border rounded-md font-medium transition-colors ${!hasPrevPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e8e6df]'
@@ -159,31 +162,54 @@ const App: React.FC = () => {
                         </button>
 
                         <div className="flex gap-1 mx-2">
-                            {Array.from({ length: totalPages }).map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => {
-                                        const newPage = i + 1;
-                                        setPage(newPage);
-                                        updateUrlParams(newPage, perPage);
-                                    }}
-                                    className="w-10 h-10 rounded-md font-medium transition-colors"
-                                    style={{
-                                        backgroundColor: page === i + 1 ? "#1a2e1a" : "transparent",
-                                        color: page === i + 1 ? "#fff" : "#1a2e1a",
-                                        border: page === i + 1 ? "none" : "1px solid #c8c4b8"
-                                    }}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
+                            {(() => {
+                                const range = [];
+                                const delta = 1; 
+                                
+                                for (let i = 1; i <= totalPages; i++) {
+                                    if (
+                                        i === 1 || 
+                                        i === totalPages || 
+                                        (i >= page - delta && i <= page + delta)
+                                    ) {
+                                        range.push(i);
+                                    } else if (range[range.length - 1] !== "...") {
+                                        range.push("...");
+                                    }
+                                }
+
+                                return range.map((p, i) => (
+                                    p === "..." ? (
+                                        <span key={`dots-${i}`} className="px-2 self-center">...</span>
+                                    ) : (
+                                        <button
+                                            key={i}
+                                            onClick={() => {
+                                                const newPage = p as number;
+                                                setPage(newPage);
+                                                updateUrlParams(newPage, perPage);
+                                            }}
+                                            className="w-10 h-10 rounded-md font-medium transition-colors"
+                                            style={{
+                                                backgroundColor: page === p ? "#1a2e1a" : "transparent",
+                                                color: page === p ? "#fff" : "#1a2e1a",
+                                                border: page === p ? "none" : "1px solid #c8c4b8"
+                                            }}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                ));
+                            })()}
                         </div>
 
                         <button
                             onClick={() => {
-                                const newPage = Math.min(totalPages, page + 1);
-                                setPage(newPage);
-                                updateUrlParams(newPage, perPage);
+                                if (hasNextPage) {
+                                    const newPage = page + 1;
+                                    setPage(newPage);
+                                    updateUrlParams(newPage, perPage);
+                                }
                             }}
                             disabled={!hasNextPage}
                             className={`px-4 py-2 border rounded-md font-medium transition-colors ${!hasNextPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e8e6df]'

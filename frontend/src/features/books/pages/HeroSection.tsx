@@ -30,7 +30,6 @@ export const HeroSection: React.FC = () => {
           Browse 12,000+ titles. Reserve in seconds.
         </p>
 
-        {/* Hero search (optional - kept same design) */}
         {/*
         <div className="flex rounded-2xl overflow-hidden shadow-2xl max-w-xl mx-auto border border-white/10">
           <input
