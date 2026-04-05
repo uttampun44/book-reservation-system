@@ -19,7 +19,7 @@
 //   { id: 16, title: "The Martian",             author: "Andy Weir",           genre: "Sci-fi",    rating: 4.7, available: 2, cover: "#c8b0a0", coverAccent: "#c04a20", isbn: "978-0553418026", coverUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=600&fit=crop" },
 // ];
 
-export const GENRES: string[] = ["All", "Fiction", "Non-Fiction", "Science Fiction", "Classic", "Mystery", "Memoir", "Finance"];
+export const GENRES: string[] = ["All", "Fiction", "Non-Fiction", "Science Fiction", "Mystery"];
 export const SORT_OPTIONS: string[] = ["Most Popular", "Highest Rated", "Price: Low to High", "Price: High to Low", "Title A–Z"];
 export const PER_PAGE_OPTIONS: number[] = [6, 12, 24, 48];
 export const ITEMS_PER_PAGE = 6;
