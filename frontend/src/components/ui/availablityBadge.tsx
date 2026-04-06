@@ -10,7 +10,7 @@ const AvailabilityBadge: React.FC<AvailabilityBadgeProps> = ({ book }) => {
     return (
       <span
         className="px-2.5 py-1 rounded-full text-xs font-semibold"
-        style={{ background: "rgba(188, 198, 193, 0.15)", color: "#ecf3f0ff" }}
+        style={{ background: "rgba(127, 136, 132, 0.15)", color: "rgb(94, 99, 97)" }}
       >
         In Stock
       </span>

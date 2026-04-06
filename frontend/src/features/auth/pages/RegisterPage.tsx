@@ -17,8 +17,8 @@ export function RegisterPage() {
         </div>
 
         <form className="mt-8 space-y-5">
-          <TextInput label="Full name" placeholder="Alex" type="text" />
-          <TextInput label="Email address" placeholder="you@email.com" type="email" />
+          <TextInput label="Full name" placeholder="name" type="text" />
+          <TextInput label="Email address" placeholder="you@gmail.com" type="email" />
           <PasswordInput label="Password" placeholder="••••••••" />
           <PasswordInput label="Confirm Password" placeholder="••••••••" />
           <div className="pt-4">
