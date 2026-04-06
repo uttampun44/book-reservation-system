@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   searchValue: string;
@@ -7,7 +8,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-
+const navigate = useNavigate();
   return (
     <>
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-[#f5f4f0]/90 backdrop-blur-md border-b border-black/10">
@@ -52,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
           <button className="text-sm font-medium text-[#1a2e1a] hover:opacity-70 transition-opacity">
             My Books
           </button>
-          <button className="px-5 py-2 rounded-full text-sm font-bold bg-[#c9a84c] text-white hover:opacity-90 active:scale-95 transition-all">
+          <button onClick={()=> navigate("/register")} className="px-5 py-2 rounded-full text-sm font-bold bg-[#c9a84c] text-white hover:opacity-90 active:scale-95 transition-all">
             Sign up
           </button>
         </div>
