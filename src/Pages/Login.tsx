@@ -1,19 +1,17 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../Auth.css";
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; login?: string }>({});
 
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Email is invalid";
-
     if (!password) newErrors.password = "Password is required";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -22,8 +20,17 @@ const Login: React.FC = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    alert(`Logging in with ${email}`);
-    // TODO: call backend API
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find((u: any) => u.email === email && u.password === password);
+
+    if (!user) {
+      setErrors({ ...errors, login: "Invalid email or password" });
+      return;
+    }
+
+    alert(`Welcome back, ${user.firstName}!`);
+    // Redirect to home/dashboard
+    navigate("/dashboard"); // you can create a dummy dashboard page
   };
 
   return (
@@ -36,29 +43,19 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label>Email address</label>
-            <input
-              type="email"
-              placeholder="alex@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             {errors.email && <p style={{ color: "red", fontSize: 12 }}>{errors.email}</p>}
           </div>
 
           <div className="input-group">
             <label>Password</label>
-            <input
-              type="password"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             {errors.password && <p style={{ color: "red", fontSize: 12 }}>{errors.password}</p>}
           </div>
 
-          <button className="auth-btn" type="submit">
-            Sign in
-          </button>
+          {errors.login && <p style={{ color: "red", fontSize: 12 }}>{errors.login}</p>}
+
+          <button className="auth-btn" type="submit">Sign in</button>
         </form>
 
         <div className="switch-text">

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../Auth.css";
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,13 +19,10 @@ const Signup: React.FC = () => {
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!firstName) newErrors.firstName = "First name is required";
-
     if (!email) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Email is invalid";
-
     if (!password) newErrors.password = "Password is required";
     else if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
-
     if (!confirmPassword) newErrors.confirmPassword = "Confirm your password";
     else if (confirmPassword !== password) newErrors.confirmPassword = "Passwords do not match";
 
@@ -35,8 +34,13 @@ const Signup: React.FC = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    // Save user info in localStorage
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    users.push({ firstName, email, password });
+    localStorage.setItem("users", JSON.stringify(users));
+
     alert(`Account created for ${firstName}`);
-    // TODO: call backend API
+    navigate("/"); // Redirect to login
   };
 
   return (
@@ -44,57 +48,32 @@ const Signup: React.FC = () => {
       <div className="auth-card">
         <div className="logo">📚</div>
         <h2>Create your account</h2>
-
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label>First name</label>
-            <input
-              type="text"
-              placeholder="Alex"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
+            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             {errors.firstName && <p style={{ color: "red", fontSize: 12 }}>{errors.firstName}</p>}
           </div>
 
           <div className="input-group">
             <label>Email address</label>
-            <input
-              type="email"
-              placeholder="you@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             {errors.email && <p style={{ color: "red", fontSize: 12 }}>{errors.email}</p>}
           </div>
 
           <div className="input-group">
             <label>Password</label>
-            <input
-              type="password"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             {errors.password && <p style={{ color: "red", fontSize: 12 }}>{errors.password}</p>}
           </div>
 
           <div className="input-group">
             <label>Confirm Password</label>
-            <input
-              type="password"
-              placeholder="********"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            {errors.confirmPassword && (
-              <p style={{ color: "red", fontSize: 12 }}>{errors.confirmPassword}</p>
-            )}
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            {errors.confirmPassword && <p style={{ color: "red", fontSize: 12 }}>{errors.confirmPassword}</p>}
           </div>
 
-          <button className="auth-btn" type="submit">
-            Create account
-          </button>
+          <button className="auth-btn" type="submit">Create account</button>
         </form>
 
         <div className="switch-text">
