@@ -1,0 +1,170 @@
+name: Book Reservation System CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - development
+
+# jobs for backend, frontend and integrated
+jobs:
+
+  # backend
+  backend:
+    name: Build Backend
+    uses: ./.github/workflows/backend.yml
+    with:
+      node-version: '24'
+      working-directory: './backend'
+    secrets: inherit 
+    #   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+    #   MONGO_URI: ${{ secrets.VERCEL_MONGO_URI }}
+    #   NODE_ENV: ${{ secrets.NODE_ENV }}
+
+  # frontend
+  frontend:
+    name: Build Frontend
+    uses: ./.github/workflows/frontend.yml
+    with:
+      node-version: '24'
+      working-directory: './frontend'
+    secrets: inherit
+
+  # integration
+  integration:
+    name: Integrate Test
+    needs: [frontend, backend]
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      frontend-directory: './frontend'
+      backend-directory: './backend'
+    secrets: inherit
+
+  # Simple success check
+  check-success:
+    name: All Builds Complete
+    needs: [integration]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "✅ All builds passed!"
+
+  # Backend deployment stagging
+  deploy-backend-staging:
+    name: Deploy Backend Staging
+    runs-on: ubuntu-latest
+    needs: check-success
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    outputs:
+      staging_url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Backend to Stagging Vercel
+        id: deploy
+        run: |
+          npm install -g vercel
+          URL=$(vercel deploy ./backend \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --yes)                                 
+          echo "url=$URL" >> $GITHUB_OUTPUT 
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    
+
+  # Frontend deployment stagging
+  deploy-frontend-staging:
+    name: Deploy Frontend Staging
+    runs-on: ubuntu-latest
+    needs: check-success
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    outputs:
+      staging_url: ${{ steps.deploy.outputs.url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Deploy Frontend to Vercel
+        id: deploy
+        run: |
+          npm install -g vercel
+          URL=$(vercel deploy ./frontend \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --yes)                                   
+          echo "url=$URL" >> $GITHUB_OUTPUT 
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_FRONTEND_PROJECT_ID }}
+
+  # smoking test for staging environment
+  smoke-test:
+    name: Smoke Test Staging
+    runs-on: ubuntu-latest
+    needs: [deploy-backend-staging, deploy-frontend-staging]
+    steps:
+    - name: Wait for Staging to be Ready
+      run: sleep 15
+
+    # - name: Test Frontend is Live
+    #   run: |
+    #     curl --fail --retry 5 --retry-delay 10 \
+    #       ${{ needs.deploy-frontend-staging.outputs.staging_url }}
+
+    - name: Test Books Search and Pagination
+      run: |
+        curl --fail --retry 5 --retry-delay 10 \
+          "${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/books?page=1&limit=10&search=test"
+
+    - name: Test All API Routes are Live
+      run: |
+        VITE_BACKEND_URL="${{ secrets.BACKEND_URL }}/api/v1"
+
+        ROUTES=(
+          "books"
+        )
+
+        for ROUTE in "${ROUTES[@]}"; do
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 "$VITE_BACKEND_URL/$ROUTE")
+          if [ "$STATUS" == "200" ] || [ "$STATUS" == "401" ] || [ "$STATUS" == "403" ]; then
+            echo "✅ /api/v1/$ROUTE returned $STATUS"
+          else
+            echo "❌ /api/v1/$ROUTE failed with status $STATUS"
+            exit 1
+          fi
+        done
+
+   
+        # backend deployment production
+  deploy-backend-production:
+    name: Deploy Backend to Production
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v6
+    - run: |
+        npm install -g vercel
+        vercel deploy ./backend \
+          --token=${{ secrets.VERCEL_TOKEN }} \
+          --prod --yes
+      env:
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  deploy-frontend-production:
+    name: Deploy Frontend to Production
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v6
+    - run: |
+        npm install -g vercel
+        vercel deploy ./frontend \
+          --token=${{ secrets.VERCEL_TOKEN }} \
+          --prod --yes
+      env:
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_FRONTEND_PROJECT_ID }}
