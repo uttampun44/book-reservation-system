@@ -5,15 +5,13 @@ import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 
 interface BookCardProps {
   book: Book;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { isBookReserved } = useReservations();
   const { addToCart, isBookInCart } = useCart();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -65,7 +63,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         border: "1px solid rgba(0,0,0,0.06)",
       }}
     >
-      {/* Success Success feedback overlay */}
       {showSuccess && (
         <div 
           className="absolute inset-x-0 top-0 bg-[#c9a84c] text-white py-2 text-center text-xs font-bold animate-in fade-in slide-in-from-top-4 duration-300 z-50 shadow-md"

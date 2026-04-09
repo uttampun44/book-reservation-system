@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
 import { useNavigate } from "react-router-dom";

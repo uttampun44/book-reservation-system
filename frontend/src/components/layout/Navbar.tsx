@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
-import { useCart } from "../../features/books/context/CartContext";
+import { useCart } from "../../features/books/hooks/useCart";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 
 interface NavbarProps {
