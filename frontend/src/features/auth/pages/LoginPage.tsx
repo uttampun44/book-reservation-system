@@ -20,16 +20,16 @@ export function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6">
-          <TextInput 
-            label="Email address" 
-            placeholder="you@gmail.com" 
-            type="email" 
+          <TextInput
+            label="Email address"
+            placeholder="you@gmail.com"
+            type="email"
           />
-          <PasswordInput 
-            label="Password" 
-            placeholder="••••••••••••" 
+          <PasswordInput
+            label="Password"
+            placeholder="••••••••••••"
           />
-          
+
           <div className="pt-2">
             <Button type="submit" fullWidth>
               Sign in
@@ -38,8 +38,8 @@ export function LoginPage() {
 
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
-            <Link 
-              to="/register" 
+            <Link
+              to="/register"
               className="inline-flex items-center gap-1 font-medium text-[#1A3A2A] hover:underline"
             >
               Create one <ArrowRight className="h-4 w-4" />
