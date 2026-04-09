@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
-import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
 import { useCart } from "../hooks/useCart";
 
@@ -16,24 +14,19 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const { addToCart, isBookInCart } = useCart();
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Derived state
   const reserved = isBookReserved(book.id);
   const inCart = isBookInCart(book.id);
   const canReserve = book.inStock;
   const isOut = !canReserve;
 
   const handleAction = () => {
-    // 1. Check stock
     if (isOut) return;
     
-    // 2. Already reserved
     if (reserved) return;
 
-    // 3. Add to Cart (Ecommerce style)
     if (!inCart) {
       addToCart(book);
       
-      // 4. Show Success Message
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     }
