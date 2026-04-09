@@ -1,43 +1,79 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Check } from "lucide-react";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
+import { useAuth } from "../../auth/hooks/useAuth";
+import { useReservations } from "../hooks/useReservations";
+import { useCart } from "../context/CartContext";
 
 interface BookCardProps {
   book: Book;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
-  const [reserved, setReserved] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isBookReserved } = useReservations();
+  const { addToCart, isBookInCart } = useCart();
+  const [showSuccess, setShowSuccess] = useState(false);
 
+  // Derived state
+  const reserved = isBookReserved(book.id);
+  const inCart = isBookInCart(book.id);
   const canReserve = book.inStock;
   const isOut = !canReserve;
 
   const handleAction = () => {
+    // 1. Check stock
     if (isOut) return;
-    setReserved(true);
+    
+    // 2. Already reserved
+    if (reserved) return;
+
+    // 3. Add to Cart (Ecommerce style)
+    if (!inCart) {
+      addToCart(book);
+      
+      // 4. Show Success Message
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    }
   };
 
   const getButtonStyle = (): React.CSSProperties => {
     if (isOut) return { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" };
-    return reserved
-      ? { background: "#2d6a4f22", color: "#2d6a4f", border: "1.5px solid #2d6a4f55" }
+    if (reserved) return { background: "#2d6a4f22", color: "#2d6a4f", border: "1.5px solid #2d6a4f55", cursor: "default" };
+    
+    return inCart
+      ? { background: "#c9a84c22", color: "#c9a84c", border: "1.5px solid #c9a84c55", cursor: "default" }
       : { background: "#1a2e1a", color: "#fff", cursor: "pointer" };
   };
 
-  const getButtonLabel = (): string => {
+  const getButtonLabel = () => {
     if (isOut) return "Unavailable";
-    return reserved ? "✓ Reserved" : "Reserve";
+    if (reserved) return "✓ Reserved";
+    return inCart ? "✓ In Cart" : "Add to Cart";
   };
 
   return (
     <div
-      className="rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+      className="relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
       style={{
         background: "#fff",
         boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
         border: "1px solid rgba(0,0,0,0.06)",
       }}
     >
+      {/* Success Success feedback overlay */}
+      {showSuccess && (
+        <div 
+          className="absolute inset-x-0 top-0 bg-[#c9a84c] text-white py-2 text-center text-xs font-bold animate-in fade-in slide-in-from-top-4 duration-300 z-50 shadow-md"
+        >
+          ✨ Added to Cart!
+        </div>
+      )}
+
       <div
         className="relative h-48 flex items-center justify-center overflow-hidden"
         style={{
@@ -83,10 +119,11 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 
         <button
           onClick={handleAction}
-          disabled={isOut}
-          className="mt-2 w-full py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 active:scale-95"
+          disabled={isOut || reserved || inCart}
+          className="mt-2 w-full py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 active:scale-95 disabled:active:scale-100 flex items-center justify-center gap-2"
           style={getButtonStyle()}
         >
+          {reserved || inCart ? <Check className="w-4 h-4" /> : null}
           {getButtonLabel()}
         </button>
       </div>

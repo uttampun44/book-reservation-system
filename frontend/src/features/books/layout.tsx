@@ -7,8 +7,10 @@ import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
 import type { Book, Pagination } from "./types/book";
+import { CartProvider } from "./context/CartContext";
+import CartDrawer from "./components/CartDrawer";
 
-const App: React.FC = () => {
+const BookListPageContent: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [search, setSearch] = useState("");
     const [activeGenre, setActiveGenre] = useState("All");
@@ -20,6 +22,8 @@ const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pagination, setPagination] = useState<Pagination | null>(null);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [showGlobalSuccess, setShowGlobalSuccess] = useState(false);
 
     const updateUrlParams = useCallback((newPage: number, newPerPage: number) => {
         setSearchParams({ page: String(newPage), perPage: String(newPerPage) });
@@ -109,9 +113,14 @@ const App: React.FC = () => {
 
     const safeFilteredBooks = filteredBooks ?? [];
 
+    const handleShowGlobalSuccess = () => {
+        setShowGlobalSuccess(true);
+        setTimeout(() => setShowGlobalSuccess(false), 5000);
+    };
+
     return (
         <div
-            className="min-h-screen"
+            className="min-h-screen relative"
             style={{ background: "#f5f4f0", fontFamily: "'Inter', sans-serif" }}
         >
             <style>{`
@@ -122,7 +131,29 @@ const App: React.FC = () => {
         ::-webkit-scrollbar-thumb { background: #c8c4b8; border-radius: 3px; }
       `}</style>
 
-            <Navbar searchValue={search} onSearchChange={handleSearchChange} />
+            <Navbar 
+                searchValue={search} 
+                onSearchChange={handleSearchChange} 
+                onOpenCart={() => setIsCartOpen(true)}
+            />
+
+            <CartDrawer 
+                isOpen={isCartOpen} 
+                onClose={() => setIsCartOpen(false)} 
+                onShowSuccess={handleShowGlobalSuccess}
+            />
+
+            {showGlobalSuccess && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-10 duration-500">
+                    <div className="bg-[#1a2e1a] text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10">
+                        <span className="text-xl">✅</span>
+                        <div>
+                            <p className="font-bold text-sm">Reservations Confirmed!</p>
+                            <p className="text-xs text-white/70">Your books are ready for pick-up.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <HeroSection
             />
@@ -164,12 +195,12 @@ const App: React.FC = () => {
                         <div className="flex gap-1 mx-2">
                             {(() => {
                                 const range = [];
-                                const delta = 1; 
-                                
+                                const delta = 1;
+
                                 for (let i = 1; i <= totalPages; i++) {
                                     if (
-                                        i === 1 || 
-                                        i === totalPages || 
+                                        i === 1 ||
+                                        i === totalPages ||
                                         (i >= page - delta && i <= page + delta)
                                     ) {
                                         range.push(i);
@@ -222,6 +253,14 @@ const App: React.FC = () => {
                 )}
             </main>
         </div>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <CartProvider>
+            <BookListPageContent />
+        </CartProvider>
     );
 };
 
