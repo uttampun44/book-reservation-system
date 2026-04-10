@@ -1,0 +1,66 @@
+
+services:
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: book-reservation-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - book-reservation-network
+    restart: unless-stopped
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+    container_name: book-reservation-backend
+    ports:
+      - "${PORT:-8000}:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=${PORT:-8000}
+      - MONGO_URI=mongodb://mongo:27017/book
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - book-reservation-network
+    restart: unless-stopped
+
+ # MongoDB database Service 
+  mongo:
+    image: mongo:latest
+    container_name: book-reservation-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db                        
+    networks:
+      - book-reservation-network
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+
+networks:
+  book-reservation-network:
+    driver: bridge

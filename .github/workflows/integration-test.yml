@@ -1,0 +1,71 @@
+name: Integration Tests and Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_call:
+    inputs:
+      backend-directory:
+        required: false
+        type: string
+        default: './backend'
+      frontend-directory:
+        required: false
+        type: string
+        default: './frontend'
+    secrets:
+      VERCEL_TOKEN:
+        required: false
+      VERCEL_ORG_ID:
+        required: false
+      VERCEL_PROJECT_ID_BACKEND:
+        required: false
+      VERCEL_PROJECT_ID_FRONTEND:
+        required: false
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          check-latest: true
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Run Backend Tests
+        working-directory: ./backend
+        run: npm test
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint Frontend
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+  

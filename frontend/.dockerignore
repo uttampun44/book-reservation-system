@@ -1,0 +1,26 @@
+# node_modules
+node_modules/
+
+# build output
+dist/
+
+# assets
+src/assets/
+
+# environment variables
+.env
+
+# Git
+.git
+.gitignore
+
+# Editor / OS noise
+.DS_Store
+.vscode
+.idea
+Thumbs.db
+
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml

@@ -1,0 +1,22 @@
+ARG NODE_VERSION=22-alpine
+ 
+FROM node:${NODE_VERSION} AS dev
+
+# Set working directory inside the container
+WORKDIR /app
+ 
+# Copy package files
+COPY package*.json ./
+ 
+# Install dependencies
+RUN npm install
+ 
+# Copy rest of the source code
+COPY . .
+
+ 
+# Expose Vite dev server port
+EXPOSE 8000
+ 
+# Run tsx watch in dev mode
+CMD ["npm", "run", "dev"]

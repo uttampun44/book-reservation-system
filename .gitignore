@@ -1,0 +1,28 @@
+# frontend gitignore
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# backend gitignore
+backend/node_modules/
+# backend/dist/
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / Editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+
+.vercel
+.env*.local
