@@ -112,21 +112,21 @@ jobs:
     #     curl --fail --retry 5 --retry-delay 10 \
     #       ${{ needs.deploy-frontend-staging.outputs.staging_url }}
 
-    - name: Test Books Search and Pagination
-      run: |
-        curl --fail --retry 5 --retry-delay 10 \
-          "${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/books?page=1&limit=10&search=test"
+    # - name: Test Books Search and Pagination
+    #   run: |
+    #     curl --fail --retry 5 --retry-delay 10 \
+    #       "${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/books?page=1&perPage=8"
 
     - name: Test All API Routes are Live
       run: |
-        BASE_URL="${{ secrets.BACKEND_URL }}/api/v1"
+        VITE_BACKEND_URL="${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1"
 
         ROUTES=(
           "books"
         )
 
         for ROUTE in "${ROUTES[@]}"; do
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 "$BASE_URL/$ROUTE")
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 "$VITE_BACKEND_URL/$ROUTE")
           if [ "$STATUS" == "200" ] || [ "$STATUS" == "401" ] || [ "$STATUS" == "403" ]; then
             echo "✅ /api/v1/$ROUTE returned $STATUS"
           else

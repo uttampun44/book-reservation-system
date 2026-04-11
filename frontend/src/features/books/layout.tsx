@@ -54,8 +54,7 @@ const BookListPageContent: React.FC = () => {
             setLoading(true);
             try {
                 const data = await getBooks(page, perPage, sortBy);
-                console.log("Fetched books:--------", data);
-
+        
                 setBooks(data.data);
                 setPagination(data.pagination);
             } catch (err) {

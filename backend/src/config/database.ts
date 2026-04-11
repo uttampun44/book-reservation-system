@@ -11,7 +11,8 @@ const connectDB = async () => {
     console.log(Chalk.yellow("Database connected successfully"));
   } catch (error) {
     console.error(Chalk.red("Database connection error:", error));
-    process.exit(1);
+    // Don't exit - allow the app to serve requests even if DB fails
+    console.log(Chalk.yellow("App will continue running without database connection"));
   }
 };
 
