@@ -26,8 +26,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/", Routes);
 
 connectDB();
-app.listen(Port, () => {
-  console.log(chalk.green(`Server is running at http://localhost:${Port}`));
-});
+
+// Only start the server if not in production (Vercel will handle it)
+if (process.env.NODE_ENV !== "production") {
+  const Port = process.env.PORT || 8080;
+  app.listen(Port, () => {
+    console.log(chalk.green(`Server is running at http://localhost:${Port}`));
+  });
+}
 
 export default app;
