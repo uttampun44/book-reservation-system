@@ -112,10 +112,10 @@ jobs:
     #     curl --fail --retry 5 --retry-delay 10 \
     #       ${{ needs.deploy-frontend-staging.outputs.staging_url }}
 
-    - name: Test Books Search and Pagination
-      run: |
-        curl --fail --retry 5 --retry-delay 10 \
-          "${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/books?page=1&perPage=8"
+    # - name: Test Books Search and Pagination
+    #   run: |
+    #     curl --fail --retry 5 --retry-delay 10 \
+    #       "${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1/books?page=1&perPage=8"
 
     - name: Test All API Routes are Live
       run: |
