@@ -3,6 +3,12 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install --production=false",
   "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "dist/index.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",

@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 
 const DEFAULT_PAGE     = 1;
-const DEFAULT_PER_PAGE = 6;
+const DEFAULT_PER_PAGE = 8;
 
 /**
  * Paginate any array.
