@@ -27,6 +27,7 @@ app.use("/api/v1/", Routes);
 
 connectDB();
 
+// Only start the server if not in production (Vercel will handle it)
 if (process.env.NODE_ENV !== "production") {
   const Port = process.env.PORT || 8080;
   app.listen(Port, () => {
