@@ -64,7 +64,8 @@ jobs:
         id: deploy
         run: |
           npm install -g vercel
-          URL=$(vercel deploy ./backend \
+          cd ./backend
+          URL=$(vercel deploy \
             --token=${{ secrets.VERCEL_TOKEN }} \
             --yes)                                 
           echo "url=$URL" >> $GITHUB_OUTPUT 
