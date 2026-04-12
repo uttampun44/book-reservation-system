@@ -4,6 +4,7 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import BookListPage from "../features/books/layout";
 import BookDetailsPage from "../features/books/pages/BookDetailsPage";
 import MyReservationsPage from "../features/books/pages/MyReservationsPage";
+import HomeRouter from "./HomeRouter";
 
 
 export const router = createBrowserRouter([
@@ -21,7 +22,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <BookListPage />,
+    element: <HomeRouter />,
   },
   {
     path: "/login",

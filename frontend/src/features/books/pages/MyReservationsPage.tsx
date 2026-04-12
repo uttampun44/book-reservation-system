@@ -1,11 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Book as BookIcon, Calendar, Trash2, Loader2, Info } from "lucide-react";
 import Navbar from "../../../components/layout/Navbar";
 import { useReservations } from "../hooks/useReservations";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 const MyReservationsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const { reservedBooks, loading, error, handleUnreserve } = useReservations();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f4f0]" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -19,7 +25,7 @@ const MyReservationsPage: React.FC = () => {
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <Link 
-              to="/" 
+              to="/books" 
               className="inline-flex items-center gap-2 text-[#2d6a4f] font-medium hover:opacity-80 transition-opacity mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -65,7 +71,7 @@ const MyReservationsPage: React.FC = () => {
                You haven't reserved any books yet. Browse our collection and pick something you'd like to read!
              </p>
              <Link 
-              to="/" 
+              to="/books" 
               className="px-8 py-3 bg-[#1a2e1a] text-white rounded-xl font-bold hover:bg-[#2d6a4f] transition-all active:scale-95 shadow-lg shadow-black/10"
              >
                Browse Library

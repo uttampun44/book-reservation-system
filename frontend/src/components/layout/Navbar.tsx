@@ -70,18 +70,28 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <button 
-            onClick={() => navigate("/reservations")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-black/5 hover:bg-gray-50 transition-all active:scale-95 group relative"
-          >
-            <BookmarkCheck className="w-5 h-5 text-[#1a2e1a] group-hover:scale-110 transition-transform" />
-            <span className="text-sm font-bold text-[#1a2e1a]">Reservations</span>
-            {reservedBooks.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#f5f4f0] animate-in zoom-in duration-300">
-                {reservedBooks.length}
-              </span>
-            )}
-          </button>
+          {isAuthenticated && (
+            <>
+              <button 
+                onClick={() => navigate("/books")}
+                className="text-sm font-bold text-gray-500 hover:text-[#1a2e1a] transition-colors"
+              >
+                Browse Books
+              </button>
+              <button 
+                onClick={() => navigate("/reservations")}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-black/5 hover:bg-gray-50 transition-all active:scale-95 group relative"
+              >
+                <BookmarkCheck className="w-5 h-5 text-[#1a2e1a] group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-bold text-[#1a2e1a]">Reservations</span>
+                {reservedBooks.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#f5f4f0] animate-in zoom-in duration-300">
+                    {reservedBooks.length}
+                  </span>
+                )}
+              </button>
+            </>
+          )}
  
           <div className="h-6 w-[1px] bg-black/10 mx-1" />
 
@@ -126,13 +136,15 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
           </div>
 
           <div className="flex flex-col gap-3 text-sm font-bold text-[#1a2e1a] pt-2">
-            <Link to="/" className="py-2 hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>Browse Library</Link>
-            <Link to="/reservations" className="py-2 flex items-center justify-between hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>
-              My Reservations
-              {reservedBooks.length > 0 && (
-                <span className="bg-[#c9a84c] text-white px-2 py-0.5 rounded-full text-[10px]">{reservedBooks.length}</span>
-              )}
-            </Link>
+            <Link to="/books" className="py-2 hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>Browse Library</Link>
+            {isAuthenticated && (
+              <Link to="/reservations" className="py-2 flex items-center justify-between hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>
+                My Reservations
+                {reservedBooks.length > 0 && (
+                  <span className="bg-[#c9a84c] text-white px-2 py-0.5 rounded-full text-[10px]">{reservedBooks.length}</span>
+                )}
+              </Link>
+            )}
             {!isAuthenticated && (
               <button 
                 onClick={() => navigate("/login")}
