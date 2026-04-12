@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { X, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { useReservations } from "../hooks/useReservations";
 import { useNavigate } from "react-router-dom";
+import { reserveBooks } from "../api/reserveBooks";
 import ReservationModal from "./ReservationModal";
 
 interface CartDrawerProps {
@@ -15,9 +15,10 @@ interface CartDrawerProps {
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onShowSuccess }) => {
   const { cartItems, removeFromCart, clearCart, totalItems } = useCart();
   const { isAuthenticated } = useAuth();
-  const { reserveBook } = useReservations();
   const navigate = useNavigate();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isReserving, setIsReserving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -32,23 +33,42 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onShowSuccess 
     }
   };
 
-  const handleFinalConfirm = () => {
-    // Reserve all books in cart
-    cartItems.forEach((book) => {
-      reserveBook(book.id);
-    });
+  const handleFinalConfirm = async () => {
+    setIsReserving(true);
+    setError(null);
+    try {
+      const reservationData = cartItems.map((item) => ({
+        bookId: item.id,
+        reserveDate: new Date().toISOString().split("T")[0], 
+      }));
 
-    // Clear cart and close
-    clearCart();
-    setIsConfirmModalOpen(false);
-    onClose();
-    onShowSuccess();
+      const response = await reserveBooks(reservationData);
+
+      if (response.success) {
+        clearCart();
+        setIsConfirmModalOpen(false);
+        onClose();
+        onShowSuccess();
+      } else {
+        setError(response.message || "Failed to reserve books");
+      }
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        setError(axiosError.response?.data?.message || "An unexpected error occurred.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsReserving(false);
+    }
   };
 
   return (
     <>
       <div className="fixed inset-0 z-[100] overflow-hidden">
-        {/* Backdrop */}
         <div 
           className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
           onClick={onClose}
@@ -57,7 +77,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onShowSuccess 
         <div className="absolute inset-y-0 right-0 max-w-full flex">
           <div className="w-screen max-w-md bg-[#f5f4f0] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             
-            {/* Header */}
             <div className="px-6 py-5 border-b border-black/10 flex items-center justify-between bg-white/50 backdrop-blur-md sticky top-0 z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#1a2e1a] flex items-center justify-center">
@@ -163,6 +182,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onShowSuccess 
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={handleFinalConfirm}
         items={cartItems}
+        isLoading={isReserving}
+        error={error}
       />
     </>
   );

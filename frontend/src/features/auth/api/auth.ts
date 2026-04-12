@@ -45,3 +45,8 @@ export const loginUser = async (data: LoginFormData): Promise<AuthResponse> => {
   const response = await api.post("/api/v1/auth/login", data);
   return response.data;
 };
+
+export const logoutUser = async (): Promise<AuthResponse> => {
+  const response = await api.post("/api/v1/auth/logout");
+  return response.data;
+};

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { logoutUser } from "../api/auth";
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -10,9 +11,16 @@ export function useAuth() {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem("isLoggedIn");
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.error("Logout API failed:", error);
+    } finally {
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("token");
+      setIsAuthenticated(false);
+    }
   };
 
   return { isAuthenticated, login, logout };

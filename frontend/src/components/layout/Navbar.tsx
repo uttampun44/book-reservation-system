@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
 import { useCart } from "../../features/books/hooks/useCart";
 import { useAuth } from "../../features/auth/hooks/useAuth";
+import LogoutModal from "../../features/auth/components/LogoutModal";
 
 interface NavbarProps {
   searchValue: string;
@@ -12,9 +13,25 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const { isAuthenticated, logout } = useAuth();
+
+  const handleLogoutConfirm = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      setIsLogoutModalOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <>
@@ -65,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
               </span>
             )}
           </button>
-
+ 
           <div className="h-6 w-[1px] bg-black/10 mx-1" />
 
           {isAuthenticated ? (
@@ -74,10 +91,10 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
                 <User className="w-4 h-4 text-[#1a2e1a]" />
               </div>
               <button 
-                onClick={logout}
+                onClick={() => setIsLogoutModalOpen(true)}
                 className="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors pr-1"
               >
-                Sign out
+                Log out
               </button>
             </div>
           ) : (
@@ -120,6 +137,13 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
           </div>
         </div>
       )}
+
+      <LogoutModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleLogoutConfirm}
+        isLoading={isLoggingOut}
+      />
     </>
   );
 };

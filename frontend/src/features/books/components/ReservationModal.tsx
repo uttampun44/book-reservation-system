@@ -1,5 +1,5 @@
 import React from "react";
-import { X, CheckCircle, Info } from "lucide-react";
+import { X, CheckCircle, Info, Loader2 } from "lucide-react";
 import type { Book } from "../types/book";
 
 interface ReservationModalProps {
@@ -7,13 +7,17 @@ interface ReservationModalProps {
   onClose: () => void;
   onConfirm: () => void;
   items: Book[];
+  isLoading?: boolean;
+  error?: string | null;
 }
 
 const ReservationModal: React.FC<ReservationModalProps> = ({ 
   isOpen, 
   onClose, 
   onConfirm, 
-  items 
+  items,
+  isLoading = false,
+  error = null
 }) => {
   if (!isOpen) return null;
 
@@ -47,10 +51,19 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
             <button 
               onClick={onClose}
               className="p-2 rounded-full hover:bg-black/5 transition-colors"
+              disabled={isLoading}
             >
               <X className="w-6 h-6 text-gray-400" />
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <Info className="w-5 h-5 text-red-500" />
+              <p className="text-sm font-medium text-red-700">{error}</p>
+            </div>
+          )}
 
           {/* Summary Box */}
           <div className="bg-gray-50 rounded-2xl p-6 border border-black/5 mb-8">
@@ -93,15 +106,24 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
           <div className="flex gap-4">
             <button 
               onClick={onClose}
-              className="flex-1 py-4 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 transition-all border border-transparent active:scale-95"
+              disabled={isLoading}
+              className="flex-1 py-4 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 transition-all border border-transparent active:scale-95 disabled:opacity-50"
             >
               Edit Selection
             </button>
             <button 
               onClick={onConfirm}
-              className="flex-1 py-4 rounded-2xl bg-[#1a2e1a] text-white font-bold shadow-xl shadow-black/10 hover:opacity-95 active:scale-95 transition-all"
+              disabled={isLoading}
+              className="flex-1 py-4 rounded-2xl bg-[#1a2e1a] text-white font-bold shadow-xl shadow-black/10 hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-80"
             >
-              Confirm & Reserve
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Reserving...
+                </>
+              ) : (
+                "Confirm & Reserve"
+              )}
             </button>
           </div>
         </div>
