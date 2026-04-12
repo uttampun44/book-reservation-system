@@ -67,7 +67,6 @@ jobs:
           cd backend
           npm install --production=false
           vercel pull --yes --token=${{ secrets.VERCEL_TOKEN }}
-          vercel build --token=${{ secrets.VERCEL_TOKEN }}
           URL=$(vercel deploy --prebuilt \
            --token=${{ secrets.VERCEL_TOKEN }} \
            --yes)
@@ -151,7 +150,6 @@ jobs:
         cd backend
         npm install --production=false
         vercel pull --yes --token=${{ secrets.VERCEL_TOKEN }}
-        vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         vercel deploy --prebuilt --prod \
          --token=${{ secrets.VERCEL_TOKEN }} \
          --yes
