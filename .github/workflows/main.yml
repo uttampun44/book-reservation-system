@@ -121,10 +121,8 @@ jobs:
     - name: Test All API Routes are Live
       run: |
         VITE_BACKEND_URL="https://book-reservation-system-backend.vercel.app/api/v1"
-
-        ROUTES=(
-          "books"
-        )
+        echo "Testing: $VITE_BACKEND_URL"
+        ROUTES=("books")
 
         for ROUTE in "${ROUTES[@]}"; do
         STATUS=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 "$VITE_BACKEND_URL/$ROUTE")
