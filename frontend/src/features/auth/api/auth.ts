@@ -15,9 +15,20 @@ export interface RegisterFormData {
   password: string;
 }
 
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 export interface AuthResponse {
   success: boolean;
   message: string;
+  token?: string;
+  user?: {
+    id: string;
+    fullname?: string;
+    email: string;
+  };
   users?: {
     id: string;
     fullname: string;
@@ -27,5 +38,10 @@ export interface AuthResponse {
 
 export const registerUser = async (data: RegisterFormData): Promise<AuthResponse> => {
   const response = await api.post("/api/v1/auth/register", data);
+  return response.data;
+};
+
+export const loginUser = async (data: LoginFormData): Promise<AuthResponse> => {
+  const response = await api.post("/api/v1/auth/login", data);
   return response.data;
 };

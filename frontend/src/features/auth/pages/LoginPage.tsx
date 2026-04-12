@@ -1,20 +1,66 @@
-import React from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
 import { PasswordInput } from "../components/passwordInput";
 import { BookLogo } from "../components/Logo";
 import { useAuth } from "../hooks/useAuth";
+import { loginUser } from "../api/auth";
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login();
-    navigate("/");
+    setError(null);
+
+    if (!formData.email || !formData.password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await loginUser({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.success) {
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+        }
+        login();
+        navigate("/");
+      } else {
+        setError(response.message || "Invalid email or password.");
+      }
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        setError(axiosError.response?.data?.message || "An unexpected error occurred.");
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,21 +77,40 @@ export function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+              {error}
+            </div>
+          )}
+
           <TextInput
             label="Email address"
             placeholder="you@gmail.com"
             type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             required
           />
           <PasswordInput
             label="Password"
             placeholder="••••••••••••"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             required
           />
 
           <div className="pt-2">
-            <Button type="submit" fullWidth>
-              Sign in
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Signing in...
+                </span>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </div>
 
