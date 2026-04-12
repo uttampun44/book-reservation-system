@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { BookListResponse } from "../types/book";
+import type { Book, BookListResponse } from "../types/book";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8000",
@@ -29,4 +29,12 @@ export const getBooks = async (
     params: { page, perPage, sortBy: sortByValue },
   });
   return response.data;
+};
+
+export const getBookById = async (id: string): Promise<Book | undefined> => {
+  // Frontend workaround: fetch list and find by ID
+  const response = await api.get("/api/v1/books", {
+    params: { perPage: 100 }, 
+  });
+  return response.data.data.find((book: Book) => book.id === id);
 };

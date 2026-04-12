@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
 import { useReservations } from "../hooks/useReservations";
@@ -19,14 +20,15 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const canReserve = book.inStock;
   const isOut = !canReserve;
 
-  const handleAction = () => {
-    if (isOut) return;
+  const handleAction = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     
+    if (isOut) return;
     if (reserved) return;
 
     if (!inCart) {
       addToCart(book);
-      
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     }
@@ -48,12 +50,14 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   };
 
   return (
-    <div
-      className="relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+    <Link
+      to={`/books/${book.id}`}
+      className="relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl no-underline"
       style={{
         background: "#fff",
         boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
         border: "1px solid rgba(0,0,0,0.06)",
+        color: "inherit"
       }}
     >
       {showSuccess && (
@@ -117,7 +121,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           {getButtonLabel()}
         </button>
       </div>
-    </div>
+    </Link>
   );
 };
 
