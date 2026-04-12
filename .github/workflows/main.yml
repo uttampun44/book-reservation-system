@@ -120,7 +120,7 @@ jobs:
 
     - name: Test All API Routes are Live
       run: |
-        VITE_BACKEND_URL="${{ needs.deploy-backend-staging.outputs.staging_url }}/api/v1"
+        VITE_BACKEND_URL="https://book-reservation-system-backend.vercel.app/api/v1"
 
         ROUTES=(
           "books"
