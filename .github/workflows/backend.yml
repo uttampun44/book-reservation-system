@@ -49,8 +49,8 @@ jobs:
       - name: Install dependencies
         run: npm i
       
-      # - name: Run tests
-      #   run: npm test
+      - name: Run tests
+        run: npm test
        
       - name: Build backend
         id: build
