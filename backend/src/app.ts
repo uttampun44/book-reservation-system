@@ -21,6 +21,7 @@ export const app: Express = express();
 const Port = process.env.PORT || 8080;
 
 app.use(Cors(corsOptions));
+app.options('*', Cors(corsOptions))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/", Routes);
