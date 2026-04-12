@@ -4,13 +4,17 @@ import { ArrowLeft,  Heart, Loader2 } from "lucide-react";
 import { getBookById } from "../api/getBookList";
 import type { Book } from "../types/book";
 import { useReservations } from "../hooks/useReservations";
+import ReservationModal from "../components/ReservationModal";
 
 const BookDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [book, setBook] = useState<Book | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingBook, setLoadingBook] = useState(true);
   const [activeTab, setActiveTab] = useState("Description");
-  const { isBookReserved, reserveBook } = useReservations();
+  const { isBookReserved, handleReserve, handleUnreserve, loading: reservationLoading } = useReservations();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [reservationError, setReservationError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -21,13 +25,13 @@ const BookDetailsPage: React.FC = () => {
       } catch (error) {
         console.error("Error fetching book:", error);
       } finally {
-        setLoading(false);
+        setLoadingBook(false);
       }
     };
     fetchBook();
   }, [id]);
 
-  if (loading) {
+  if (loadingBook) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <Loader2 className="w-10 h-10 text-[#1a2e1a] animate-spin" />
@@ -48,6 +52,26 @@ const BookDetailsPage: React.FC = () => {
 
   const reserved = isBookReserved(book.id);
 
+  const handleReservationAction = async () => {
+    if (reserved) {
+      await handleUnreserve(book.id);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  const onConfirmReservation = async () => {
+    setReservationError(null);
+    const result = await handleReserve(book);
+    if (result.success) {
+      setIsModalOpen(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } else {
+      setReservationError(result.message || "Failed to reserve book");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#333] font-sans">
       <div className="max-w-6xl mx-auto px-6 py-8">
@@ -60,6 +84,14 @@ const BookDetailsPage: React.FC = () => {
           <span>Back to Browse</span>
         </Link>
 
+        {showSuccess && (
+          <div 
+            className="mb-6 bg-[#c9a84c] text-white py-3 px-6 rounded-2xl text-center font-bold animate-in fade-in slide-in-from-top-4 duration-300 shadow-md"
+          >
+            ✨ Reservation Confirmed! You can view it in your reservations list.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           
           {/* Left Side: Book Cover */}
@@ -69,18 +101,11 @@ const BookDetailsPage: React.FC = () => {
               style={{ backgroundColor: book.coverColor || "#f3f4f6" }}
             >
               <img 
-                src={book.coverImage?.large} 
+                src={book.coverImage?.large || book.imageUrl} 
                 alt={book.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/5" />
-              
-              {!book.coverImage?.large && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 p-8 text-center italic border-2 border-dashed border-gray-300 rounded-3xl m-4">
-                   <p className="text-lg font-medium">Book Cover</p>
-                   <p className="text-sm">(image placeholder)</p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -102,11 +127,17 @@ const BookDetailsPage: React.FC = () => {
               </p>
             </div>
 
+            {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-md">
-          
               <div className="bg-[#f0f4f0] rounded-2xl p-4 flex flex-col items-center justify-center text-center">
                 <div className="text-lg font-bold text-[#1a2e1a]">
-                  {book.reviewCount?.toLocaleString()}
+                  {book.rating || "4.5"}
+                </div>
+                <div className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mt-1">Rating</div>
+              </div>
+              <div className="bg-[#f0f4f0] rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+                <div className="text-lg font-bold text-[#1a2e1a]">
+                  {book.reviewCount?.toLocaleString() || "1.2k+"}
                 </div>
                 <div className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mt-1">Reviews</div>
               </div>
@@ -121,7 +152,7 @@ const BookDetailsPage: React.FC = () => {
             <div className="flex items-center gap-6 mb-8">
                <div className="flex items-center gap-2 text-[#2d6a4f] font-bold">
                  <div className="w-2.5 h-2.5 rounded-full bg-[#2d6a4f]" />
-                 <span>{book.inStock ? "3 copies available" : "Checking availability..."}</span>
+                 <span>{book.inStock ? "Copies available" : "Checking availability..."}</span>
                </div>
                <div className="text-gray-400 font-medium">
                  — ready same day
@@ -129,10 +160,6 @@ const BookDetailsPage: React.FC = () => {
             </div>
 
             <div className="mb-10 flex-1">
-               <p className="text-gray-600 leading-relaxed text-lg mb-8 italic">
-                 {book.description || "A story of the fabulously wealthy Jay Gatsby and his love for the beautiful Daisy Buchanan. Set in the Roaring Twenties, a tale of dreams, desire, and the American Dream."}
-               </p>
-
                <div className="flex gap-8 border-b border-gray-100 mb-6 pb-2">
                  {["Description", "Reviews", "Similar Books"].map(tab => (
                    <button
@@ -149,19 +176,24 @@ const BookDetailsPage: React.FC = () => {
                    </button>
                  ))}
                </div>
+               
+               <p className="text-gray-600 leading-relaxed text-lg mb-8 italic">
+                 {book.description || "Loading description..."}
+               </p>
             </div>
 
             <div className="flex flex-wrap gap-4 mt-auto">
               <button
-                onClick={() => !reserved && reserveBook(book.id)}
-                disabled={reserved}
-                className={`px-12 py-4 rounded-xl font-black text-lg shadow-lg transition-all active:scale-95 ${
+                onClick={handleReservationAction}
+                disabled={reservationLoading || !book.inStock}
+                className={`flex-1 sm:flex-none px-12 py-4 rounded-xl font-black text-lg shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 ${
                   reserved 
-                    ? "bg-[#f0fdf4] text-[#2d6a4f] cursor-default border-2 border-[#2d6a4f]" 
+                    ? "bg-[#ef444415] text-[#ef4444] border-2 border-[#ef444430] hover:bg-[#ef444425]" 
                     : "bg-[#1a2e1a] text-white hover:bg-[#2d6a4f]"
-                }`}
+                } ${(!book.inStock) ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                {reserved ? "Book Reserved ✓" : "Reserve this Book"}
+                {reservationLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : null}
+                {reserved ? "Unreserve Book" : "Reserve this Book"}
               </button>
               
               <button 
@@ -175,8 +207,18 @@ const BookDetailsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ReservationModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={onConfirmReservation}
+        items={[book]}
+        isLoading={reservationLoading}
+        error={reservationError}
+      />
     </div>
   );
 };
 
 export default BookDetailsPage;
+

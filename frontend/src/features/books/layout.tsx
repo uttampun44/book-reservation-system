@@ -7,8 +7,6 @@ import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
 import type { Book, Pagination } from "./types/book";
-import { CartProvider } from "./context/CartContext";
-import CartDrawer from "./components/CartDrawer";
 
 const BookListPageContent: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -22,8 +20,6 @@ const BookListPageContent: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [pagination, setPagination] = useState<Pagination | null>(null);
-    const [isCartOpen, setIsCartOpen] = useState(false);
-    const [showGlobalSuccess, setShowGlobalSuccess] = useState(false);
 
     const updateUrlParams = useCallback((newPage: number, newPerPage: number) => {
         setSearchParams({ page: String(newPage), perPage: String(newPerPage) });
@@ -112,11 +108,6 @@ const BookListPageContent: React.FC = () => {
 
     const safeFilteredBooks = filteredBooks ?? [];
 
-    const handleShowGlobalSuccess = () => {
-        setShowGlobalSuccess(true);
-        setTimeout(() => setShowGlobalSuccess(false), 5000);
-    };
-
     return (
         <div
             className="min-h-screen relative"
@@ -133,29 +124,9 @@ const BookListPageContent: React.FC = () => {
             <Navbar 
                 searchValue={search} 
                 onSearchChange={handleSearchChange} 
-                onOpenCart={() => setIsCartOpen(true)}
             />
 
-            <CartDrawer 
-                isOpen={isCartOpen} 
-                onClose={() => setIsCartOpen(false)} 
-                onShowSuccess={handleShowGlobalSuccess}
-            />
-
-            {showGlobalSuccess && (
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in slide-in-from-top-10 duration-500">
-                    <div className="bg-[#1a2e1a] text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10">
-                        <span className="text-xl">✅</span>
-                        <div>
-                            <p className="font-bold text-sm">Reservations Confirmed!</p>
-                            <p className="text-xs text-white/70">Your books are ready for pick-up.</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <HeroSection
-            />
+            <HeroSection />
 
             <FilterBar
                 activeGenre={activeGenre}
@@ -255,12 +226,4 @@ const BookListPageContent: React.FC = () => {
     );
 };
 
-const App: React.FC = () => {
-    return (
-        <CartProvider>
-            <BookListPageContent />
-        </CartProvider>
-    );
-};
-
-export default App;
+export default BookListPageContent;

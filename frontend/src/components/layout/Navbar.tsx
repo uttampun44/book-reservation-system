@@ -1,24 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ShoppingBag, Search, Menu, X, User } from "lucide-react";
-import { useCart } from "../../features/books/hooks/useCart";
+import { useNavigate, Link } from "react-router-dom";
+import { Search, Menu, X, User, BookmarkCheck } from "lucide-react";
 import { useAuth } from "../../features/auth/hooks/useAuth";
+import { useReservations } from "../../features/books/hooks/useReservations";
 import LogoutModal from "../../features/auth/components/LogoutModal";
 
 interface NavbarProps {
   searchValue: string;
   onSearchChange: (val: string) => void;
-  onOpenCart: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart }) => {
+const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const navigate = useNavigate();
-  const { totalItems } = useCart();
   const { isAuthenticated, logout } = useAuth();
+  const { reservedBooks } = useReservations();
 
   const handleLogoutConfirm = async () => {
     setIsLoggingOut(true);
@@ -72,13 +71,14 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
 
         <div className="hidden md:flex items-center gap-4">
           <button 
-            onClick={onOpenCart}
-            className="relative p-2.5 rounded-xl bg-white border border-black/5 hover:bg-gray-50 transition-all active:scale-95 group"
+            onClick={() => navigate("/reservations")}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-black/5 hover:bg-gray-50 transition-all active:scale-95 group relative"
           >
-            <ShoppingBag className="w-5 h-5 text-[#1a2e1a] group-hover:scale-110 transition-transform" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white animate-in zoom-in duration-300">
-                {totalItems}
+            <BookmarkCheck className="w-5 h-5 text-[#1a2e1a] group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-bold text-[#1a2e1a]">Reservations</span>
+            {reservedBooks.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#f5f4f0] animate-in zoom-in duration-300">
+                {reservedBooks.length}
               </span>
             )}
           </button>
@@ -116,10 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
         <div className="md:hidden px-6 py-4 flex flex-col gap-3 bg-[#ece9e2] border-b border-black/10">
 
           <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#888" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.35-4.35" strokeLinecap="round" />
-            </svg>
+            <Search className="w-4 h-4 text-gray-400" />
             <input
               className="flex-1 bg-transparent outline-none text-sm"
               placeholder="Search..."
@@ -128,12 +125,22 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange, onOpenCart
             />
           </div>
 
-          <div className="flex gap-4 text-sm font-medium text-[#1a2e1a]">
-            <button>Browse</button>
-            <button>My Books</button>
-            <button className="ml-auto px-4 py-1.5 rounded-full font-bold text-white bg-[#c9a84c]">
-              Sign up
-            </button>
+          <div className="flex flex-col gap-3 text-sm font-bold text-[#1a2e1a] pt-2">
+            <Link to="/" className="py-2 hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>Browse Library</Link>
+            <Link to="/reservations" className="py-2 flex items-center justify-between hover:opacity-70 transition-opacity" onClick={() => setMobileOpen(false)}>
+              My Reservations
+              {reservedBooks.length > 0 && (
+                <span className="bg-[#c9a84c] text-white px-2 py-0.5 rounded-full text-[10px]">{reservedBooks.length}</span>
+              )}
+            </Link>
+            {!isAuthenticated && (
+              <button 
+                onClick={() => navigate("/login")}
+                className="mt-2 w-full py-3 rounded-xl bg-[#1a2e1a] text-white"
+              >
+                Sign in
+              </button>
+            )}
           </div>
         </div>
       )}
