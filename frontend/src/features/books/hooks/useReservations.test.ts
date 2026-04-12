@@ -10,7 +10,6 @@ vi.mock("../api/reserveBooks", () => ({
   unreserveBook: vi.fn(),
 }));
 
-// Mock Data
 const mockBook1 = {
   id: "book-1",
   title: "Mock Title",
@@ -42,7 +41,7 @@ describe("useReservations Hook", () => {
     const { result } = renderHook(() => useReservations());
     
     expect(result.current.reservedBooks).toEqual([]);
-    expect(result.current.loading).toBe(true); // Should be loading 
+    expect(result.current.loading).toBe(true);  
   });
 
   it("should fetch and set reserved books on mount", async () => {
@@ -54,7 +53,6 @@ describe("useReservations Hook", () => {
 
     const { result } = renderHook(() => useReservations());
 
-    // Wait for the async effect to complete
     await act(async () => {
       await new Promise(resolve => setTimeout(resolve, 0)); 
     });
@@ -80,7 +78,6 @@ describe("useReservations Hook", () => {
     });
 
     expect(api.reserveBooks).toHaveBeenCalledTimes(1);
-    // getReservedBooks should be called twice: mount + after reserve success
     expect(api.getReservedBooks).toHaveBeenCalledTimes(2);
     expect(result.current.reservedBooks).toEqual([mockReservationItem]);
   });
