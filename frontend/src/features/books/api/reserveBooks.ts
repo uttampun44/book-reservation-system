@@ -45,6 +45,7 @@ export const reserveBooks = async (
   reservations: ReservationRequest[]
 ): Promise<ReservationResponse> => {
   const response = await api.post("/api/v1/reserve-books", reservations);
+  console.log("response-------", response.data);
   return response.data;
 };
 
@@ -56,4 +57,5 @@ export const getReservedBooks = async (): Promise<ReservationResponse> => {
 export const unreserveBook = async (bookId: string): Promise<ReservationResponse> => {
   const response = await api.delete(`/api/v1/unreserve-books/${bookId}`);
   return response.data;
+
 };

@@ -5,14 +5,17 @@ import { getBookById } from "../api/getBookList";
 import type { Book } from "../types/book";
 import { useReservations } from "../hooks/useReservations";
 import ReservationModal from "../components/ReservationModal";
-
+import { useAuth } from "../../auth/hooks/useAuth";
+import LoginModal from "../../auth/components/LoginModal";
 const BookDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [book, setBook] = useState<Book | null>(null);
   const [loadingBook, setLoadingBook] = useState(true);
   const [activeTab, setActiveTab] = useState("Description");
   const { isBookReserved, handleReserve, handleUnreserve, loading: reservationLoading } = useReservations();
+  const { isAuthenticated } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [reservationError, setReservationError] = useState<string | null>(null);
 
@@ -53,6 +56,11 @@ const BookDetailsPage: React.FC = () => {
   const reserved = isBookReserved(book.id);
 
   const handleReservationAction = async () => {
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     if (reserved) {
       await handleUnreserve(book.id);
     } else {
@@ -215,6 +223,11 @@ const BookDetailsPage: React.FC = () => {
         items={[book]}
         isLoading={reservationLoading}
         error={reservationError}
+      />
+
+      <LoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </div>
   );

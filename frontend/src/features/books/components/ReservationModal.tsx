@@ -11,10 +11,10 @@ interface ReservationModalProps {
   error?: string | null;
 }
 
-const ReservationModal: React.FC<ReservationModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
+const ReservationModal: React.FC<ReservationModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
   items,
   isLoading = false,
   error = null
@@ -25,18 +25,14 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center px-4 overflow-hidden">
-      {/* Backdrop with higher blur for focus */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300" 
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
-
-      {/* Modal Container */}
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        
-        {/* Decorative header */}
-        <div className="h-2 bg-[#c9a84c]" />
-        
+
+        <div className="h-2 " />
+
         <div className="p-8">
           <div className="flex justify-between items-start mb-6">
             <div className="flex items-center gap-3">
@@ -48,7 +44,7 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                 <p className="text-sm text-gray-500 font-medium">Finalize your book selection</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="p-2 rounded-full hover:bg-black/5 transition-colors"
               disabled={isLoading}
@@ -57,7 +53,6 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
             </button>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
               <Info className="w-5 h-5 text-red-500" />
@@ -65,13 +60,12 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
             </div>
           )}
 
-          {/* Summary Box */}
           <div className="bg-gray-50 rounded-2xl p-6 border border-black/5 mb-8">
             <div className="flex items-center justify-between mb-4 pb-4 border-b border-black/5">
               <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Reservation Summary</span>
               <span className="text-xs font-bold bg-[#1a2e1a] text-white px-2.5 py-1 rounded-full">{totalCount} Books</span>
             </div>
-            
+
             <ul className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {items.map((book) => (
                 <li key={book.id} className="flex justify-between items-center group">
@@ -79,17 +73,11 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
                     <p className="font-bold text-[#1a2e1a] text-sm truncate group-hover:text-[#c9a84c] transition-colors">{book.title}</p>
                     <p className="text-xs text-gray-400">{book.author}</p>
                   </div>
-                  <span className="text-sm font-bold text-[#1a2e1a] tabular-nums">${book.price}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="mt-6 pt-4 border-t border-black/5 flex justify-between items-center">
-              <span className="font-bold text-[#1a2e1a]">Total Price Due</span>
-              <span className="text-2xl font-black text-[#1a2e1a]">
-                ${items.reduce((acc, item) => acc + item.price, 0).toFixed(2)}
-              </span>
-            </div>
+
           </div>
 
           {/* Info section */}
@@ -104,14 +92,14 @@ const ReservationModal: React.FC<ReservationModalProps> = ({
 
           {/* Actions */}
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={onClose}
               disabled={isLoading}
               className="flex-1 py-4 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 transition-all border border-transparent active:scale-95 disabled:opacity-50"
             >
               Edit Selection
             </button>
-            <button 
+            <button
               onClick={onConfirm}
               disabled={isLoading}
               className="flex-1 py-4 rounded-2xl bg-[#1a2e1a] text-white font-bold shadow-xl shadow-black/10 hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-80"

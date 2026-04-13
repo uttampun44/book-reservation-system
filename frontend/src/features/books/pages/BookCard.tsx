@@ -5,14 +5,17 @@ import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
 import { useReservations } from "../hooks/useReservations";
 import ReservationModal from "../components/ReservationModal";
-
+import { useAuth } from "../../auth/hooks/useAuth";
+import LoginModal from "../../auth/components/LoginModal";
 interface BookCardProps {
   book: Book;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const { isBookReserved, handleReserve, handleUnreserve, loading } = useReservations();
+  const { isAuthenticated } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +28,11 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
     e.stopPropagation();
     
     if (isOut) return;
+
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
 
     if (reserved) {
       await handleUnreserve(book.id);
@@ -116,9 +124,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             >
               {book.genre}
             </span>
-            <span className="text-sm font-bold" style={{ color: "#1a2e1a" }}>
-              ${book.price}
-            </span>
+   
           </div>
 
           <button
@@ -140,6 +146,11 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         items={[book]}
         isLoading={loading}
         error={error}
+      />
+
+      <LoginModal 
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
     </>
   );
