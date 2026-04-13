@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Search, Menu, X, User, BookmarkCheck } from "lucide-react";
+import { Search, Menu, X, User, BookmarkCheck, ShoppingBag } from "lucide-react";
 import { useAuth } from "../../features/auth/hooks/useAuth";
 import { useReservations } from "../../features/books/hooks/useReservations";
+import { useCart } from "../../context/useCart";
 import LogoutModal from "../../features/auth/components/LogoutModal";
 
 interface NavbarProps {
@@ -18,6 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();
   const { reservedBooks } = useReservations();
+  const { cartItems, setIsCartOpen } = useCart();
 
   const handleLogoutConfirm = async () => {
     setIsLoggingOut(true);
@@ -87,6 +89,18 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
                 {reservedBooks.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#f5f4f0] animate-in zoom-in duration-300">
                     {reservedBooks.length}
+                  </span>
+                )}
+              </button>
+              <button 
+                onClick={() => setIsCartOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a2e1a] text-white hover:opacity-90 transition-all active:scale-95 group relative"
+              >
+                <ShoppingBag className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+                <span className="text-sm font-bold text-white">My List</span>
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#1a2e1a] animate-in zoom-in duration-300">
+                    {cartItems.length}
                   </span>
                 )}
               </button>

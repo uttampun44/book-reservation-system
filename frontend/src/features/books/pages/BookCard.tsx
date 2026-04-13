@@ -1,69 +1,66 @@
-import React, { useState } from "react";
-import {  Loader2 } from "lucide-react";
+import React from "react";
+import { ShoppingBag, Bookmark, BookmarkCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
 import { useReservations } from "../hooks/useReservations";
-import ReservationModal from "../components/ReservationModal";
+import { useCart } from "../../../context/useCart";
 import { useAuth } from "../../auth/hooks/useAuth";
 import LoginModal from "../../auth/components/LoginModal";
+import { useState } from "react";
+
 interface BookCardProps {
   book: Book;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
-  const { isBookReserved, handleReserve, handleUnreserve, loading } = useReservations();
+  const { isBookReserved } = useReservations();
+  const { addToCart, removeFromCart, isInCart, setIsCartOpen } = useCart();
   const { isAuthenticated } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const reserved = isBookReserved(book.id);
-  const canReserve = book.inStock;
-  const isOut = !canReserve;
+  const inCart = isInCart(book.id);
+  // const canReserve = book.inStock && !reserved;
+  const isOut = !book.inStock;
 
-  const handleAction = async (e: React.MouseEvent) => {
+  const handleAction = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (isOut) return;
+
+    if (isOut || reserved) return;
 
     if (!isAuthenticated) {
       setIsLoginModalOpen(true);
       return;
     }
 
-    if (reserved) {
-      await handleUnreserve(book.id);
+    if (inCart) {
+      removeFromCart(book.id);
     } else {
-      setIsModalOpen(true);
-    }
-  };
-
-  const onConfirmReservation = async () => {
-    setError(null);
-    const result = await handleReserve(book);
-    if (result.success) {
-      setIsModalOpen(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    } else {
-      setError(result.message || "Failed to reserve book");
+      addToCart(book);
+      setIsCartOpen(true);
     }
   };
 
   const getButtonStyle = (): React.CSSProperties => {
-    if (isOut) return { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" };
-    if (reserved) return { background: "#ef444415", color: "#ef4444", border: "1.5px solid #ef444430", cursor: "pointer" };
-    
+    if (reserved) return { background: "#f0fdf4", color: "#16a34a", border: "1.5px solid #bbf7d0", cursor: "default" };
+    if (isOut)    return { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" };
+    if (inCart)   return { background: "#fef9ec", color: "#92400e", border: "1.5px solid #fde68a", cursor: "pointer" };
     return { background: "#1a2e1a", color: "#fff", cursor: "pointer" };
   };
 
   const getButtonLabel = () => {
-    if (isOut) return "Unavailable";
-    if (loading) return "Processing...";
-    return reserved ? "Unreserve Book" : "Reserve Now";
+    if (reserved) return "Already Reserved";
+    if (isOut)    return "Unavailable";
+    if (inCart)   return "Remove from List";
+    return "Add to List";
+  };
+
+  const getButtonIcon = () => {
+    if (reserved) return <BookmarkCheck className="w-4 h-4" />;
+    if (inCart)   return <Bookmark className="w-4 h-4" />;
+    return <ShoppingBag className="w-4 h-4" />;
   };
 
   return (
@@ -75,22 +72,19 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           background: "#fff",
           boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
           border: "1px solid rgba(0,0,0,0.06)",
-          color: "inherit"
+          color: "inherit",
         }}
       >
-        {showSuccess && (
-          <div 
-            className="absolute inset-x-0 top-0 bg-[#c9a84c] text-white py-2 text-center text-xs font-bold animate-in fade-in slide-in-from-top-4 duration-300 z-50 shadow-md"
-          >
-            ✨ Reservation Confirmed!
+        {/* In-cart indicator banner */}
+        {inCart && (
+          <div className="absolute inset-x-0 top-0 bg-[#c9a84c] text-white py-1.5 text-center text-[10px] font-bold z-10 tracking-wide">
+            ✓ In Your List
           </div>
         )}
 
         <div
           className="relative h-48 flex items-center justify-center overflow-hidden"
-          style={{
-            backgroundColor: book.coverColor || "#1a2e1a",
-          }}
+          style={{ backgroundColor: book.coverColor || "#1a2e1a" }}
         >
           <img
             src={book.coverImage?.large || book.imageUrl}
@@ -98,7 +92,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             className="absolute inset-0 w-full h-full object-cover opacity-95 transition-opacity hover:opacity-100"
           />
           <div className="absolute inset-0 bg-black/10" />
-
           <div className="absolute top-2.5 left-2.5 z-10">
             <AvailabilityBadge book={book} />
           </div>
@@ -124,31 +117,21 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             >
               {book.genre}
             </span>
-   
           </div>
 
           <button
             onClick={handleAction}
-            disabled={isOut || loading}
+            disabled={isOut || reserved}
             className="mt-3 w-full py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 active:scale-95 disabled:active:scale-100 flex items-center justify-center gap-2"
             style={getButtonStyle()}
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (reserved ? null : null)}
+            {getButtonIcon()}
             {getButtonLabel()}
           </button>
         </div>
       </Link>
 
-      <ReservationModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={onConfirmReservation}
-        items={[book]}
-        isLoading={loading}
-        error={error}
-      />
-
-      <LoginModal 
+      <LoginModal
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
       />
@@ -157,4 +140,3 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 };
 
 export default BookCard;
-

@@ -39,6 +39,7 @@ export interface ReservationResponse {
   success: boolean;
   message: string;
   data?: ReservedItem[];
+  duplicates?: string[];
 }
 
 export const reserveBooks = async (
