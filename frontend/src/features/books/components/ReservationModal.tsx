@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, ShoppingBag, Trash2, CheckCircle, Info, Loader2, ArrowRight, AlertTriangle } from "lucide-react";
+import { X, ShoppingBag, Trash2, CheckCircle, Info, Loader2, ArrowRight } from "lucide-react";
 import type { Book } from "../types/book";
 import { useCart } from "../../../context/useCart";
 import { reserveBooks } from "../api/reserveBooks";
