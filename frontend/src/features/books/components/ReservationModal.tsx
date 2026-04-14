@@ -4,6 +4,7 @@ import type { Book } from "../types/book";
 import { useCart } from "../../../context/useCart";
 import { reserveBooks } from "../api/reserveBooks";
 import { useReservations } from "../hooks/useReservations";
+import { toast } from "react-toastify";
 
 interface ReservationError {
   message: string;
@@ -32,6 +33,7 @@ const CartDrawer: React.FC = () => {
       );
 
       if (response.success) {
+        toast.success("Books reserved successfully!");
         clearCart();
         setShowSuccess(true);
         await refreshReservations();
@@ -40,21 +42,26 @@ const CartDrawer: React.FC = () => {
           setIsCartOpen(false);
         }, 2500);
       } else {
+        const msg = response.message || "Reservation failed. Please try again.";
+        toast.error(msg);
         setReservationError({
-          message: response.message || "Reservation failed. Please try again.",
+          message: msg,
           duplicates: response.duplicates || [],
         });
       }
     } catch (err) {
       const apiData = (err as { response?: { data?: { message?: string; duplicates?: string[] } } }).response?.data;
+      const msg = apiData?.message || (err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      toast.error(msg);
       setReservationError({
-        message: apiData?.message || (err instanceof Error ? err.message : "Something went wrong. Please try again."),
+        message: msg,
         duplicates: apiData?.duplicates || [],
       });
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const bookMap = Object.fromEntries(cartItems.map((b) => [b.id, b]));
 
@@ -112,25 +119,8 @@ const CartDrawer: React.FC = () => {
           )}
 
           {reservationError && !showSuccess && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-start gap-3 p-4">
-                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-red-700">{reservationError.message}</p>
+            <div >
 
-                  {duplicateBooks.length > 0 && (
-                    <ul className="mt-2 space-y-1">
-                      {duplicateBooks.map((book) => (
-                        <li key={book.id} className="flex items-center gap-2 text-xs text-red-600">
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0" />
-                          <span className="font-semibold truncate">{book.title}</span>
-                          <span className="text-red-400 flex-shrink-0">— already reserved</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
 
               {duplicateBooks.length > 0 && (
                 <div className="px-4 pb-4">
@@ -145,12 +135,7 @@ const CartDrawer: React.FC = () => {
             </div>
           )}
 
-          {!showSuccess && reservationError && reservationError.duplicates.length === 0 && (
-            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3">
-              <Info className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <p className="text-sm font-medium text-red-700">{reservationError.message}</p>
-            </div>
-          )}
+ 
 
           {!showSuccess && cartItems.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">

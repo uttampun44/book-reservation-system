@@ -7,6 +7,7 @@ import { PasswordInput } from "../components/passwordInput";
 import { BookLogo } from "../components/Logo";
 import { useAuth } from "../hooks/useAuth";
 import { loginUser } from "../api/auth";
+import { toast } from "react-toastify";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -41,7 +42,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
     setError(null);
 
     if (!formData.email || !formData.password) {
-      setError("Please fill in all required fields.");
+      const msg = "Please fill in all required fields.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -57,29 +60,31 @@ const LoginModal: React.FC<LoginModalProps> = ({
           localStorage.setItem("token", response.token);
         }
         login();
+        toast.success("Welcome back! Login successful.");
         onClose(); 
         navigate("/");
       } else {
-        setError(response.message || "Invalid email or password.");
+        const msg = response.message || "Invalid email or password.";
+        setError(msg);
+        toast.error(msg);
       }
     } catch (err: unknown) {
+      let msg = "An unexpected error occurred.";
       if (err && typeof err === "object" && "response" in err) {
         const axiosError = err as {
           response?: { data?: { message?: string } };
         };
-        setError(
-          axiosError.response?.data?.message ||
-            "An unexpected error occurred."
-        );
+        msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
+        msg = err.message;
       }
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">

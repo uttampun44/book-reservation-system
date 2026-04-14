@@ -7,6 +7,7 @@ import { PasswordInput } from "../components/passwordInput";
 import { BookLogo } from "../components/Logo";
 import { useAuth } from "../hooks/useAuth";
 import { loginUser } from "../api/auth";
+import { toast } from "react-toastify";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export function LoginPage() {
 
     if (!formData.email || !formData.password) {
       setError("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
@@ -45,23 +47,28 @@ export function LoginPage() {
           localStorage.setItem("token", response.token);
         }
         login();
+        toast.success("Welcome back! Login successful.");
         navigate("/");
       } else {
-        setError(response.message || "Invalid email or password.");
+        const msg = response.message || "Invalid email or password.";
+        setError(msg);
+        toast.error(msg);
       }
     } catch (err: unknown) {
+      let msg = "An unexpected error occurred.";
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosError = err as { response?: { data?: { message?: string } } };
-        setError(axiosError.response?.data?.message || "An unexpected error occurred.");
+        msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
+        msg = err.message;
       }
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
