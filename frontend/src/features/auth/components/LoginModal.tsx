@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { X, ArrowRight, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
 import { PasswordInput } from "../components/passwordInput";
@@ -9,15 +9,27 @@ import { useAuth } from "../hooks/useAuth";
 import { loginUser } from "../api/auth";
 import { toast } from "react-toastify";
 
-export function LoginPage() {
+interface LoginModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const LoginModal: React.FC<LoginModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,8 +42,9 @@ export function LoginPage() {
     setError(null);
 
     if (!formData.email || !formData.password) {
-      setError("Please fill in all required fields.");
-      toast.error("Please fill in all required fields.");
+      const msg = "Please fill in all required fields.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -48,6 +61,7 @@ export function LoginPage() {
         }
         login();
         toast.success("Welcome back! Login successful.");
+        onClose(); 
         navigate("/");
       } else {
         const msg = response.message || "Invalid email or password.";
@@ -56,8 +70,10 @@ export function LoginPage() {
       }
     } catch (err: unknown) {
       let msg = "An unexpected error occurred.";
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosError = err as { response?: { data?: { message?: string } } };
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosError = err as {
+          response?: { data?: { message?: string } };
+        };
         msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
         msg = err.message;
@@ -71,12 +87,27 @@ export function LoginPage() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
-      <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-md">
+    <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">
+      
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl animate-in zoom-in-95 duration-300">
+
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/5"
+        >
+          <X className="w-5 h-5 text-gray-400" />
+        </button>
+
         <div className="flex flex-col items-center gap-4">
           <BookLogo />
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900">Welcome back</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back
+            </h1>
             <p className="text-gray-500">
               Sign in to your BookLib account to continue reading.
             </p>
@@ -84,6 +115,7 @@ export function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
               {error}
@@ -99,6 +131,7 @@ export function LoginPage() {
             onChange={handleChange}
             required
           />
+
           <PasswordInput
             label="Password"
             placeholder="••••••••••••"
@@ -108,32 +141,33 @@ export function LoginPage() {
             required
           />
 
-          <div className="pt-2">
-            <Button type="submit" fullWidth disabled={loading}>
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-          </div>
+          <Button type="submit" fullWidth disabled={loading}>
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              "Sign in"
+            )}
+          </Button>
 
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-1 font-medium text-[#1A3A2A] hover:underline"
+            <span
+              onClick={() => {
+                onClose();
+                navigate("/register");
+              }}
+              className="inline-flex items-center gap-1 font-medium text-[#1A3A2A] hover:underline cursor-pointer"
             >
               Create one <ArrowRight className="h-4 w-4" />
-            </Link>
+            </span>
           </p>
         </form>
       </div>
     </div>
   );
-}
+};
 
-export default LoginPage;
+export default LoginModal;
