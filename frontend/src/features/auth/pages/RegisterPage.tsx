@@ -17,29 +17,22 @@ export function RegisterPage() {
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    // Basic Validation
     if (!formData.fullname || !formData.email || !formData.password) {
       toast.error("Please fill in all required fields.");
-      setError("Please fill in all required fields.");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match.");
-      setError("Passwords do not match.");
       return;
     }
 
@@ -53,14 +46,12 @@ export function RegisterPage() {
 
       if (response.success) {
         toast.success("Account created successfully!");
-        setSuccess("Account created successfully! Redirecting to login...");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
         const msg = response.message || "Registration failed.";
         toast.error(msg);
-        setError(msg);
       }
     } catch (err: unknown) {
       let msg = "An unexpected error occurred.";
@@ -71,7 +62,6 @@ export function RegisterPage() {
         msg = err.message;
       }
       toast.error(msg);
-      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -87,17 +77,6 @@ export function RegisterPage() {
         </div>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-lg">
-              {success}
-            </div>
-          )}
-
           <TextInput
             label="Full name"
             placeholder="John Doe"
