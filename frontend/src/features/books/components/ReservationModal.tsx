@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, ShoppingBag, Trash2, CheckCircle, Info, Loader2, ArrowRight, AlertTriangle } from "lucide-react";
+import { X, ShoppingBag, Trash2, CheckCircle, Loader2, ArrowRight } from "lucide-react";
 import type { Book } from "../types/book";
 import { useCart } from "../../../context/useCart";
 import { reserveBooks } from "../api/reserveBooks";
@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 
 interface ReservationError {
   message: string;
-  duplicates: string[]; 
+  duplicates: string[];
 }
 
 const CartDrawer: React.FC = () => {
@@ -81,7 +81,7 @@ const CartDrawer: React.FC = () => {
         className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
         onClick={() => !isLoading && setIsCartOpen(false)}
       />
-      <div className="fixed top-0 right-0 h-full w-full max-w-md z-[110] flex flex-col bg-[#fafaf8] shadow-2xl animate-in slide-in-from-right duration-300">
+      <div className="fixed top-0 right-0 h-full w-full max-w-lg z-[110] flex flex-col bg-[#fafaf8] shadow-2xl animate-in slide-in-from-right duration-300">
 
         <div className="flex items-center justify-between px-6 py-5 border-b border-black/8 bg-white">
           <div className="flex items-center gap-3">
@@ -135,7 +135,7 @@ const CartDrawer: React.FC = () => {
             </div>
           )}
 
- 
+
 
           {!showSuccess && cartItems.length === 0 && (
             <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
@@ -163,12 +163,7 @@ const CartDrawer: React.FC = () => {
 
         {!showSuccess && cartItems.length > 0 && (
           <div className="px-6 pb-6 pt-4 border-t border-black/8 bg-white space-y-3">
-            <div className="flex gap-2 px-1">
-              <Info className="w-4 h-4 text-[#c9a84c] flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Books will be reserved for <span className="font-bold text-gray-600">48 hours</span>. Bring your library ID to the main desk to collect.
-              </p>
-            </div>
+
 
             <div className="flex items-center justify-between px-1 py-2">
               <span className="text-sm font-semibold text-gray-500">Total books</span>
@@ -223,11 +218,10 @@ interface CartItemProps {
 
 const CartItem: React.FC<CartItemProps> = ({ book, onRemove, disabled, isDuplicate }) => (
   <div
-    className={`flex gap-3 p-3 rounded-2xl border shadow-sm group transition-all ${
-      isDuplicate
+    className={`flex gap-3 p-3 rounded-2xl border shadow-sm group transition-all ${isDuplicate
         ? "bg-red-50 border-red-200 shadow-red-100"
         : "bg-white border-black/5 hover:shadow-md"
-    }`}
+      }`}
   >
     <div
       className="w-14 h-20 rounded-xl overflow-hidden flex-shrink-0 shadow-sm"

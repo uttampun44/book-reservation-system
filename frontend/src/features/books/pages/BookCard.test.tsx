@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import BookCard from "./BookCard";
 import { MemoryRouter } from "react-router-dom";
@@ -148,9 +148,7 @@ describe("BookCard", () => {
 
     const button = screen.getByText("Already Reserved");
     expect(button).toBeInTheDocument();
-    
-    fireEvent.click(button);
-    expect(handleUnreserveMock).toHaveBeenCalledWith(mockBook.id);
+    expect(button).toBeDisabled();
   });
 
   it("shows 'Unavailable' disabled button when book is out of stock", () => {
