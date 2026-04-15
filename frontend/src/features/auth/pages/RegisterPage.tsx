@@ -6,6 +6,7 @@ import { TextInput } from "../components/Input";
 import { PasswordInput } from "../components/passwordInput";
 import { BookLogo } from "../components/Logo";
 import { registerUser } from "../api/auth";
+import { toast } from "react-toastify";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -31,11 +32,13 @@ export function RegisterPage() {
 
     // Basic Validation
     if (!formData.fullname || !formData.email || !formData.password) {
+      toast.error("Please fill in all required fields.");
       setError("Please fill in all required fields.");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
       setError("Passwords do not match.");
       return;
     }
@@ -49,26 +52,31 @@ export function RegisterPage() {
       });
 
       if (response.success) {
+        toast.success("Account created successfully!");
         setSuccess("Account created successfully! Redirecting to login...");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
-        setError(response.message || "Registration failed.");
+        const msg = response.message || "Registration failed.";
+        toast.error(msg);
+        setError(msg);
       }
     } catch (err: unknown) {
+      let msg = "An unexpected error occurred.";
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosError = err as { response?: { data?: { message?: string } } };
-        setError(axiosError.response?.data?.message || "An unexpected error occurred.");
+        msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
+        msg = err.message;
       }
+      toast.error(msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">

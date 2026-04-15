@@ -33,7 +33,7 @@ export function useReservations() {
         bookId: book.id, 
         reserveDate: new Date().toISOString() 
       }]);
-      
+      console.log("response-------", response);
       if (response.success) {
         await fetchReservations();
         return { success: true };
@@ -42,6 +42,7 @@ export function useReservations() {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to reserve book";
+      console.log("errorMessage-------", errorMessage);
       return {
         success: false,
         message: errorMessage,

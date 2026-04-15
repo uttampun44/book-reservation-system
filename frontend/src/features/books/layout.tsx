@@ -7,6 +7,7 @@ import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
 import type { Book, Pagination } from "./types/book";
+import CartDrawer from "./components/ReservationModal";
 
 const BookListPageContent: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -125,6 +126,9 @@ const BookListPageContent: React.FC = () => {
                 searchValue={search} 
                 onSearchChange={handleSearchChange} 
             />
+
+            {/* Global cart drawer — controlled by CartContext */}
+            <CartDrawer />
 
             <HeroSection />
 

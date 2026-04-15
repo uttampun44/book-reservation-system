@@ -4,19 +4,13 @@ import BookCard from "./BookCard";
 import { MemoryRouter } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
+import { useCart } from "../../../context/useCart";
 import type { Book } from "../types/book";
 
+// Mock all three hooks BookCard depends on
 vi.mock("../../auth/hooks/useAuth");
 vi.mock("../hooks/useReservations");
-
-const mockNavigate = vi.fn();
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+vi.mock("../../../context/useCart");
 
 const mockBook: Book = {
   id: "book-001",
@@ -31,11 +25,7 @@ const mockBook: Book = {
   price: 14.99,
   currency: "USD",
   imageUrl: "test-url",
-  coverImage: {
-    small: "test-url-s",
-    medium: "test-url-m",
-    large: "test-url-l",
-  },
+  coverImage: { small: "test-url-s", medium: "test-url-m", large: "test-url-l" },
   pages: 304,
   language: "English",
   publisher: "Viking",
@@ -47,26 +37,56 @@ const mockBook: Book = {
   featured: true,
 };
 
-describe("BookCard Full Reservation Functionality", () => {
+// Shared default mocks — override per test as needed
+const defaultReservationsMock = {
+  reservedBooks: [],
+  loading: false,
+  error: null,
+  isBookReserved: () => false,
+  handleReserve: vi.fn(),
+  handleUnreserve: vi.fn(),
+  refreshReservations: vi.fn(),
+};
+
+const defaultCartMock = {
+  cartItems: [],
+  addToCart: vi.fn(),
+  removeFromCart: vi.fn(),
+  clearCart: vi.fn(),
+  isInCart: () => false,
+  isCartOpen: false,
+  setIsCartOpen: vi.fn(),
+};
+
+describe("BookCard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    vi.mocked(useReservations).mockReturnValue(defaultReservationsMock);
+    vi.mocked(useCart).mockReturnValue(defaultCartMock);
   });
 
-  it("should open reservation modal when 'Reserve Now' is clicked", () => {
-    vi.mocked(useAuth).mockReturnValue({ 
-      isAuthenticated: true, 
-      login: vi.fn(), 
-      logout: vi.fn() 
+  it("shows 'Add to List' button when book is in stock and not reserved", () => {
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Add to List")).toBeInTheDocument();
+  });
+
+  it("calls addToCart and opens cart when 'Add to List' is clicked by an authenticated user", () => {
+    const addToCart = vi.fn();
+    const setIsCartOpen = vi.fn();
+    vi.mocked(useCart).mockReturnValue({
+      ...defaultCartMock,
+      addToCart,
+      setIsCartOpen,
     });
-    vi.mocked(useReservations).mockReturnValue({ 
-      reservedBooks: [],
-      loading: false,
-      error: null,
-      isBookReserved: () => false, 
-      handleReserve: vi.fn(),
-      handleUnreserve: vi.fn(),
-      refreshReservations: vi.fn()
-    } as unknown as ReturnType<typeof useReservations>);
 
     render(
       <MemoryRouter>
@@ -74,29 +94,18 @@ describe("BookCard Full Reservation Functionality", () => {
       </MemoryRouter>
     );
 
-    const reserveButton = screen.getByText("Reserve Now");
-    fireEvent.click(reserveButton);
+    fireEvent.click(screen.getByText("Add to List"));
 
-    expect(screen.getByText("Confirm Reservation")).toBeInTheDocument();
+    expect(addToCart).toHaveBeenCalledWith(mockBook);
+    expect(setIsCartOpen).toHaveBeenCalledWith(true);
   });
 
-  it("should complete reservation when confirmed in modal", async () => {
-    const handleReserveMock = vi.fn().mockResolvedValue({ success: true });
-    
-    vi.mocked(useAuth).mockReturnValue({ 
-      isAuthenticated: true, 
-      login: vi.fn(), 
-      logout: vi.fn() 
+  it("opens the login modal instead of adding to cart when user is not authenticated", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: false,
+      login: vi.fn(),
+      logout: vi.fn(),
     });
-    vi.mocked(useReservations).mockReturnValue({ 
-      reservedBooks: [],
-      loading: false,
-      error: null,
-      isBookReserved: () => false, 
-      handleReserve: handleReserveMock,
-      handleUnreserve: vi.fn(),
-      refreshReservations: vi.fn()
-    } as unknown as ReturnType<typeof useReservations>);
 
     render(
       <MemoryRouter>
@@ -104,35 +113,17 @@ describe("BookCard Full Reservation Functionality", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText("Reserve Now"));
-    
-    const confirmButtons = screen.getAllByText("Confirm Reservation");
-    fireEvent.click(confirmButtons[1]); 
-    
-    expect(handleReserveMock).toHaveBeenCalledWith(mockBook);
-    
-    await waitFor(() => {
-      expect(screen.getByText("✨ Reservation Confirmed!")).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByText("Add to List"));
+
+    // addToCart should NOT be called
+    expect(defaultCartMock.addToCart).not.toHaveBeenCalled();
   });
 
-  it("should show 'Unreserve Book' and call unreserve if book is already reserved", () => {
-    const handleUnreserveMock = vi.fn().mockResolvedValue({ success: true });
-
-    vi.mocked(useAuth).mockReturnValue({ 
-      isAuthenticated: true, 
-      login: vi.fn(), 
-      logout: vi.fn() 
+  it("shows 'Remove from List' when the book is already in the cart", () => {
+    vi.mocked(useCart).mockReturnValue({
+      ...defaultCartMock,
+      isInCart: () => true,
     });
-    vi.mocked(useReservations).mockReturnValue({ 
-      reservedBooks: [{bookId: mockBook.id}],
-      loading: false,
-      error: null,
-      isBookReserved: () => true, 
-      handleReserve: vi.fn(),
-      handleUnreserve: handleUnreserveMock,
-      refreshReservations: vi.fn()
-    } as unknown as ReturnType<typeof useReservations>);
 
     render(
       <MemoryRouter>
@@ -140,29 +131,30 @@ describe("BookCard Full Reservation Functionality", () => {
       </MemoryRouter>
     );
 
-    const button = screen.getByText("Unreserve Book");
+    expect(screen.getByText("Remove from List")).toBeInTheDocument();
+  });
+
+  it("shows 'Already Reserved' disabled button when book is already reserved", () => {
+    vi.mocked(useReservations).mockReturnValue({
+      ...defaultReservationsMock,
+      isBookReserved: () => true,
+    });
+
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+
+    const button = screen.getByText("Already Reserved");
     expect(button).toBeInTheDocument();
     
     fireEvent.click(button);
     expect(handleUnreserveMock).toHaveBeenCalledWith(mockBook.id);
   });
 
-  it("should show 'Unavailable' and disable the button if the book is out of stock", () => {
+  it("shows 'Unavailable' disabled button when book is out of stock", () => {
     const outOfStockBook = { ...mockBook, inStock: false };
-    vi.mocked(useAuth).mockReturnValue({ 
-      isAuthenticated: true, 
-      login: vi.fn(), 
-      logout: vi.fn() 
-    });
-    vi.mocked(useReservations).mockReturnValue({ 
-      reservedBooks: [],
-      loading: false,
-      error: null,
-      isBookReserved: () => false, 
-      handleReserve: vi.fn(),
-      handleUnreserve: vi.fn(),
-      refreshReservations: vi.fn()
-    } as unknown as ReturnType<typeof useReservations>);
 
     render(
       <MemoryRouter>
