@@ -7,8 +7,9 @@ import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
 import type { Book, Pagination } from "./types/book";
+import CartDrawer from "./components/ReservationModal";
 
-const App: React.FC = () => {
+const BookListPageContent: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [search, setSearch] = useState("");
     const [activeGenre, setActiveGenre] = useState("All");
@@ -50,8 +51,7 @@ const App: React.FC = () => {
             setLoading(true);
             try {
                 const data = await getBooks(page, perPage, sortBy);
-                console.log("Fetched books:--------", data);
-
+        
                 setBooks(data.data);
                 setPagination(data.pagination);
             } catch (err) {
@@ -111,7 +111,7 @@ const App: React.FC = () => {
 
     return (
         <div
-            className="min-h-screen"
+            className="min-h-screen relative"
             style={{ background: "#f5f4f0", fontFamily: "'Inter', sans-serif" }}
         >
             <style>{`
@@ -122,10 +122,15 @@ const App: React.FC = () => {
         ::-webkit-scrollbar-thumb { background: #c8c4b8; border-radius: 3px; }
       `}</style>
 
-            <Navbar searchValue={search} onSearchChange={handleSearchChange} />
-
-            <HeroSection
+            <Navbar 
+                searchValue={search} 
+                onSearchChange={handleSearchChange} 
             />
+
+            {/* Global cart drawer — controlled by CartContext */}
+            <CartDrawer />
+
+            <HeroSection />
 
             <FilterBar
                 activeGenre={activeGenre}
@@ -164,12 +169,12 @@ const App: React.FC = () => {
                         <div className="flex gap-1 mx-2">
                             {(() => {
                                 const range = [];
-                                const delta = 1; 
-                                
+                                const delta = 1;
+
                                 for (let i = 1; i <= totalPages; i++) {
                                     if (
-                                        i === 1 || 
-                                        i === totalPages || 
+                                        i === 1 ||
+                                        i === totalPages ||
                                         (i >= page - delta && i <= page + delta)
                                     ) {
                                         range.push(i);
@@ -225,4 +230,4 @@ const App: React.FC = () => {
     );
 };
 
-export default App;
+export default BookListPageContent;

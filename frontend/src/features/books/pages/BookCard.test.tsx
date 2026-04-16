@@ -1,74 +1,172 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import BookCard from "./BookCard";
+import { MemoryRouter } from "react-router-dom";
+import { useAuth } from "../../auth/hooks/useAuth";
+import { useReservations } from "../hooks/useReservations";
+import { useCart } from "../../../context/useCart";
 import type { Book } from "../types/book";
 
-const inStockBook: Book = {
-  id: "1",
-  title: "The Great Gatsby",
-  author: "F. Scott Fitzgerald",
-  genre: "Classic",
-  subGenre: "Fiction",
-  publishedYear: 1925,
-  isbn: "1234567890",
-  imageUrl: "https://example.com/gatsby.jpg",
-  coverImage: { small: "", medium: "", large: "" },
-  pages: 180,
-  language: "English",
-  publisher: "Scribner",
-  rating: 4.5,
-  reviewCount: 100,
-  price: 15.99,
+// Mock all three hooks BookCard depends on
+vi.mock("../../auth/hooks/useAuth");
+vi.mock("../hooks/useReservations");
+vi.mock("../../../context/useCart");
+
+const mockBook: Book = {
+  id: "book-001",
+  title: "The Midnight Library",
+  author: "Matt Haig",
+  genre: "Fiction",
+  subGenre: "Philosophical Fiction",
+  publishedYear: 2020,
+  isbn: "978-0-525-55947-4",
+  rating: 4.2,
+  reviewCount: 98400,
+  price: 14.99,
   currency: "USD",
-  coverColor: "#1a2e1a",
-  description: "A classic novel.",
-  tags: ["classic"],
+  imageUrl: "test-url",
+  coverImage: { small: "test-url-s", medium: "test-url-m", large: "test-url-l" },
+  pages: 304,
+  language: "English",
+  publisher: "Viking",
+  coverColor: "#1a3a5c",
+  description: "A beautiful story about life and choices.",
+  tags: ["life", "choices"],
   inStock: true,
   available: 5,
-  featured: false,
+  featured: true,
 };
 
-const outOfStockBook: Book = {
-  ...inStockBook,
-  id: "2",
-  title: "Dune",
-  inStock: false,
-  available: 0,
+// Shared default mocks — override per test as needed
+const defaultReservationsMock = {
+  reservedBooks: [],
+  loading: false,
+  error: null,
+  isBookReserved: () => false,
+  handleReserve: vi.fn(),
+  handleUnreserve: vi.fn(),
+  refreshReservations: vi.fn(),
+};
+
+const defaultCartMock = {
+  cartItems: [],
+  addToCart: vi.fn(),
+  removeFromCart: vi.fn(),
+  clearCart: vi.fn(),
+  isInCart: () => false,
+  isCartOpen: false,
+  setIsCartOpen: vi.fn(),
 };
 
 describe("BookCard", () => {
-  it("renders the book details correctly", () => {
-    render(<BookCard book={inStockBook} />);
-    expect(screen.getByText("The Great Gatsby")).toBeInTheDocument();
-    expect(screen.getByText("F. Scott Fitzgerald")).toBeInTheDocument();
-    expect(screen.getByText("Classic")).toBeInTheDocument();
-    expect(screen.getByText("$15.99")).toBeInTheDocument();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+    vi.mocked(useReservations).mockReturnValue(defaultReservationsMock);
+    vi.mocked(useCart).mockReturnValue(defaultCartMock);
   });
 
-  it("shows 'In Stock' badge and 'Reserve' button when book is available", () => {
-    render(<BookCard book={inStockBook} />);
-    expect(screen.getByText("In Stock")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Reserve" })).toBeEnabled();
+  it("shows 'Add to List' button when book is in stock and not reserved", () => {
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Add to List")).toBeInTheDocument();
   });
 
-  it("shows 'Out of Stock' badge and 'Unavailable' button when book is not available", () => {
-    render(<BookCard book={outOfStockBook} />);
-    expect(screen.getByText("Out of Stock")).toBeInTheDocument();
-    const button = screen.getByRole("button", { name: "Unavailable" });
+  it("calls addToCart and opens cart when 'Add to List' is clicked by an authenticated user", () => {
+    const addToCart = vi.fn();
+    const setIsCartOpen = vi.fn();
+    vi.mocked(useCart).mockReturnValue({
+      ...defaultCartMock,
+      addToCart,
+      setIsCartOpen,
+    });
+
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText("Add to List"));
+
+    expect(addToCart).toHaveBeenCalledWith(mockBook);
+    expect(setIsCartOpen).toHaveBeenCalledWith(true);
+  });
+
+  it("opens the login modal instead of adding to cart when user is not authenticated", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      isAuthenticated: false,
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText("Add to List"));
+
+    // addToCart should NOT be called
+    expect(defaultCartMock.addToCart).not.toHaveBeenCalled();
+  });
+
+  it("shows 'Remove from List' when the book is already in the cart", () => {
+    vi.mocked(useCart).mockReturnValue({
+      ...defaultCartMock,
+      isInCart: () => true,
+    });
+
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Remove from List")).toBeInTheDocument();
+  });
+
+  it("shows 'Already Reserved' disabled button when book is already reserved", () => {
+    const handleUnreserveMock = vi.fn();
+    vi.mocked(useReservations).mockReturnValue({
+      ...defaultReservationsMock,
+      isBookReserved: () => true,
+      handleUnreserve: handleUnreserveMock,
+    });
+
+    render(
+      <MemoryRouter>
+        <BookCard book={mockBook} />
+      </MemoryRouter>
+    );
+
+    const button = screen.getByText("Already Reserved");
+    expect(button).toBeInTheDocument();
     expect(button).toBeDisabled();
-  });
-
-  it("changes button text to '✓ Reserved' when Reserve button is clicked", () => {
-    render(<BookCard book={inStockBook} />);
-    const button = screen.getByRole("button", { name: "Reserve" });
+    
     fireEvent.click(button);
-    expect(screen.getByText("✓ Reserved")).toBeInTheDocument();
+    expect(handleUnreserveMock).not.toHaveBeenCalled();
   });
 
-  it("renders the book image", () => {
-    render(<BookCard book={inStockBook} />);
-    const img = screen.getByAltText("The Great Gatsby");
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute("src", inStockBook.imageUrl);
+  it("shows 'Unavailable' disabled button when book is out of stock", () => {
+    const outOfStockBook = { ...mockBook, inStock: false };
+
+    render(
+      <MemoryRouter>
+        <BookCard book={outOfStockBook} />
+      </MemoryRouter>
+    );
+
+    const button = screen.getByText("Unavailable");
+    expect(button).toBeInTheDocument();
+    expect(button).toBeDisabled();
   });
 });

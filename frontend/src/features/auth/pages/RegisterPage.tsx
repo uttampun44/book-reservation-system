@@ -1,64 +1,72 @@
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/Input";
 import { PasswordInput } from "../components/passwordInput";
 import { BookLogo } from "../components/Logo";
-
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-}
+import { registerUser } from "../api/auth";
+import { toast } from "react-toastify";
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    if (!fullName.trim())
-      newErrors.fullName = "Full name is required";
-
-    if (!email.trim())
-      newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email))
-      newErrors.email = "Email address is invalid";
-
-    if (!password)
-      newErrors.password = "Password is required";
-    else if (password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-
-    if (!confirmPassword)
-      newErrors.confirmPassword = "Please confirm your password";
-    else if (confirmPassword !== password)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
 
-    // Save to localStorage
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    users.push({ fullName, email, password });
-    localStorage.setItem("users", JSON.stringify(users));
+    if (!formData.fullname || !formData.email || !formData.password) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
 
-    alert(`Account created for ${fullName}`);
-    navigate("/login");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await registerUser({
+        fullname: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.success) {
+        toast.success("Account created successfully!");
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        const msg = response.message || "Registration failed.";
+        toast.error(msg);
+      }
+    } catch (err: unknown) {
+      let msg = "An unexpected error occurred.";
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        msg = axiosError.response?.data?.message || msg;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
@@ -70,65 +78,51 @@ export function RegisterPage() {
           </h1>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
-
-          {/* Full Name */}
-          <div>
-            <TextInput
-              label="Full name"
-              placeholder="John Doe"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-            {errors.fullName && (
-              <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div>
-            <TextInput
-              label="Email address"
-              placeholder="you@gmail.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div>
-            <PasswordInput
-              label="Password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {errors.password && (
-              <p className="mt-1 text-xs text-red-500">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <PasswordInput
-              label="Confirm Password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            {errors.confirmPassword && (
-              <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
-            )}
-          </div>
-
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+          <TextInput
+            label="Full name"
+            placeholder="John Doe"
+            type="text"
+            name="fullname"
+            value={formData.fullname}
+            onChange={handleChange}
+            required
+          />
+          <TextInput
+            label="Email address"
+            placeholder="you@gmail.com"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="••••••••"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <PasswordInput
+            label="Confirm Password"
+            placeholder="••••••••"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
           <div className="pt-4">
-            <Button type="submit" fullWidth>
-              Create account
+            <Button type="submit" fullWidth disabled={loading}>
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating account...
+                </span>
+              ) : (
+                "Create account"
+              )}
             </Button>
           </div>
 

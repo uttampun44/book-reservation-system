@@ -21,5 +21,5 @@
 
 export const GENRES: string[] = ["All", "Fiction", "Non-Fiction", "Science Fiction", "Mystery"];
 export const SORT_OPTIONS: string[] = ["Most Popular", "Highest Rated", "Price: Low to High", "Price: High to Low", "Title A–Z"];
-export const PER_PAGE_OPTIONS: number[] = [6, 12, 24, 48];
-export const ITEMS_PER_PAGE = 6;
+export const PER_PAGE_OPTIONS: number[] = [8, 12, 24, 48];
+export const ITEMS_PER_PAGE = 8;

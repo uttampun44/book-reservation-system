@@ -3,14 +3,14 @@
 // ---------------------------------------------------------------------------
 
 const DEFAULT_PAGE     = 1;
-const DEFAULT_PER_PAGE = 6;
+const DEFAULT_PER_PAGE = 8;
 
 /**
  * Paginate any array.
  *
  * @param {Array}  source   - Full array to paginate
  * @param {number} page     - Current page, 1-based (default: 1)
- * @param {number} perPage  - Items per page (default: 6)
+ * @param {number} perPage  - Items per page (default: 8)
  *
  * @returns {{ data: Array, pagination: Object }}
  */
