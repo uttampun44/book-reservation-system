@@ -23,18 +23,43 @@ export function RegisterPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validate = (): boolean => {
+    const emailRegex = /\S+@\S+\.\S+/;
+    // Password complex regex: Minimum 6 characters, at least one capital letter, one number, and one special character
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{6,}$/;
 
-    if (!formData.fullname || !formData.email || !formData.password) {
+    if (!formData.fullname || !formData.email || !formData.password || !formData.confirmPassword) {
       toast.error("Please fill in all required fields.");
-      return;
+      return false;
+    }
+
+    if (formData.fullname.trim().length < 2) {
+      toast.error("Full name must be at least 2 characters.");
+      return false;
+    }
+
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return false;
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      toast.error("Password must be at least 6 characters and contain a capital letter, a number, and a special character.");
+      return false;
     }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match.");
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validate()) return;
 
     setLoading(true);
     try {
@@ -78,7 +103,7 @@ export function RegisterPage() {
           </h1>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
           <TextInput
             label="Full name"
             placeholder="John Doe"

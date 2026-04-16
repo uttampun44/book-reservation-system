@@ -12,32 +12,80 @@ import { toast } from "react-toastify";
 interface FormErrors {
   email?: string;
   password?: string;
-  login?: string;
 }
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+
+  // 🔹 Validation function
+  const validateField = (name: string, value: string) => {
+    let error = "";
+
+    if (name === "email") {
+      if (!value) {
+        error = "Email is required";
+      } else if (!/\S+@\S+\.\S+/.test(value)) {
+        error = "Enter a valid email address";
+      }
+    }
+
+    if (name === "password") {
+      if (!value) {
+        error = "Password is required";
+      } else if (value.length < 6) {
+        error = "Password must be at least 6 characters";
+      } else if (!/[A-Z]/.test(value)) {
+        error = "Include at least one uppercase letter";
+      } else if (!/[0-9]/.test(value)) {
+        error = "Include at least one number";
+      }
+    }
+
+    return error;
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {
+      email: validateField("email", formData.email),
+      password: validateField("password", formData.password),
+    };
+
+    setErrors(newErrors);
+
+    const hasError = Object.values(newErrors).some((err) => err);
+    if (hasError) {
+      toast.error("Please fix the errors in the form.");
+      return false;
+    }
+
+    return true;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
+
     try {
       const response = await loginUser({
         email: formData.email,
@@ -52,23 +100,25 @@ export function LoginPage() {
         toast.success("Welcome back! Login successful.");
         navigate("/");
       } else {
-        const msg = response.message || "Invalid email or password.";
-        toast.error(msg);
+        toast.error(response.message || "Invalid email or password.");
       }
     } catch (err: unknown) {
       let msg = "An unexpected error occurred.";
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosError = err as { response?: { data?: { message?: string } } };
+
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosError = err as {
+          response?: { data?: { message?: string } };
+        };
         msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
         msg = err.message;
       }
+
       toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
@@ -84,24 +134,36 @@ export function LoginPage() {
           </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <TextInput
-            label="Email address"
-            placeholder="you@gmail.com"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <PasswordInput
-            label="Password"
-            placeholder="••••••••••••"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
+          
+          <div>
+            <TextInput
+              label="Email address"
+              placeholder="you@gmail.com"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <PasswordInput
+              label="Password"
+              placeholder="••••••••••••"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
           <div className="pt-2">
             <Button type="submit" fullWidth disabled={loading}>
