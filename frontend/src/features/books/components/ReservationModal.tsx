@@ -118,20 +118,14 @@ const CartDrawer: React.FC = () => {
             </div>
           )}
 
-          {reservationError && !showSuccess && (
-            <div >
-
-
-              {duplicateBooks.length > 0 && (
-                <div className="px-4 pb-4">
-                  <button
-                    onClick={handleRemoveDuplicates}
-                    className="w-full py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold transition-colors active:scale-95"
-                  >
-                    Remove {duplicateBooks.length} duplicate{duplicateBooks.length !== 1 ? "s" : ""} from list
-                  </button>
-                </div>
-              )}
+          {reservationError && !showSuccess && duplicateBooks.length > 0 && (
+            <div className="px-4 pb-4">
+              <button
+                onClick={handleRemoveDuplicates}
+                className="w-full py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold transition-colors active:scale-95"
+              >
+                Remove {duplicateBooks.length} duplicate{duplicateBooks.length !== 1 ? "s" : ""} from list
+              </button>
             </div>
           )}
 

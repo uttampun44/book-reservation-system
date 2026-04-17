@@ -9,33 +9,78 @@ import { useAuth } from "../hooks/useAuth";
 import { loginUser } from "../api/auth";
 import { toast } from "react-toastify";
 
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const validateField = (name: string, value: string) => {
+    let error = "";
+
+    if (name === "email") {
+      if (!value) {
+        error = "Email is required";
+      } else if (!/\S+@\S+\.\S+/.test(value)) {
+        error = "Enter a valid email address";
+      }
+    }
+
+    if (name === "password") {
+      if (!value) {
+        error = "Password is required";
+      } else if (value.length < 6) {
+        error = "Password must be at least 6 characters";
+      } else if (!/[A-Z]/.test(value)) {
+        error = "Include at least one uppercase letter";
+      } else if (!/[0-9]/.test(value)) {
+        error = "Include at least one number";
+      }
+    }
+
+    return error;
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {
+      email: validateField("email", formData.email),
+      password: validateField("password", formData.password),
+    };
+
+    setErrors(newErrors);
+
+
+
+    return true;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(null);
+
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    if (!formData.email || !formData.password) {
-      setError("Please fill in all required fields.");
-      toast.error("Please fill in all required fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
+
     try {
       const response = await loginUser({
         email: formData.email,
@@ -50,29 +95,30 @@ export function LoginPage() {
         toast.success("Welcome back! Login successful.");
         navigate("/");
       } else {
-        const msg = response.message || "Invalid email or password.";
-        setError(msg);
-        toast.error(msg);
+        toast.error(response.message || "Invalid email or password.");
       }
     } catch (err: unknown) {
       let msg = "An unexpected error occurred.";
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosError = err as { response?: { data?: { message?: string } } };
+
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosError = err as {
+          response?: { data?: { message?: string } };
+        };
         msg = axiosError.response?.data?.message || msg;
       } else if (err instanceof Error) {
         msg = err.message;
       }
-      setError(msg);
+
       toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12">
       <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-md">
+
         <div className="flex flex-col items-center gap-4">
           <BookLogo />
           <div className="text-center space-y-2">
@@ -83,30 +129,36 @@ export function LoginPage() {
           </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-              {error}
-            </div>
-          )}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
+          
+          <div>
+            <TextInput
+              label="Email address"
+              placeholder="you@gmail.com"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
 
-          <TextInput
-            label="Email address"
-            placeholder="you@gmail.com"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          <PasswordInput
-            label="Password"
-            placeholder="••••••••••••"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div>
+            <PasswordInput
+              label="Password"
+              placeholder="••••••••••••"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
+          </div>
 
           <div className="pt-2">
             <Button type="submit" fullWidth disabled={loading}>
@@ -130,6 +182,7 @@ export function LoginPage() {
               Create one <ArrowRight className="h-4 w-4" />
             </Link>
           </p>
+
         </form>
       </div>
     </div>

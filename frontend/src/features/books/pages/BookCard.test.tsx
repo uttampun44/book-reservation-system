@@ -7,7 +7,6 @@ import { useReservations } from "../hooks/useReservations";
 import { useCart } from "../../../context/useCart";
 import type { Book } from "../types/book";
 
-// Mock all three hooks BookCard depends on
 vi.mock("../../auth/hooks/useAuth");
 vi.mock("../hooks/useReservations");
 vi.mock("../../../context/useCart");
@@ -37,7 +36,6 @@ const mockBook: Book = {
   featured: true,
 };
 
-// Shared default mocks — override per test as needed
 const defaultReservationsMock = {
   reservedBooks: [],
   loading: false,
@@ -115,7 +113,6 @@ describe("BookCard", () => {
 
     fireEvent.click(screen.getByText("Add to List"));
 
-    // addToCart should NOT be called
     expect(defaultCartMock.addToCart).not.toHaveBeenCalled();
   });
 
@@ -135,9 +132,11 @@ describe("BookCard", () => {
   });
 
   it("shows 'Already Reserved' disabled button when book is already reserved", () => {
+    const handleUnreserveMock = vi.fn();
     vi.mocked(useReservations).mockReturnValue({
       ...defaultReservationsMock,
       isBookReserved: () => true,
+      handleUnreserve: handleUnreserveMock,
     });
 
     render(
@@ -149,6 +148,9 @@ describe("BookCard", () => {
     const button = screen.getByText("Already Reserved");
     expect(button).toBeInTheDocument();
     expect(button).toBeDisabled();
+    
+    fireEvent.click(button);
+    expect(handleUnreserveMock).not.toHaveBeenCalled();
   });
 
   it("shows 'Unavailable' disabled button when book is out of stock", () => {

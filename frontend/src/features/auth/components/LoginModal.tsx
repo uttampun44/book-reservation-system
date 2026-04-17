@@ -27,23 +27,19 @@ const LoginModal: React.FC<LoginModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     if (!formData.email || !formData.password) {
       const msg = "Please fill in all required fields.";
-      setError(msg);
       toast.error(msg);
       return;
     }
@@ -65,7 +61,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
         navigate("/");
       } else {
         const msg = response.message || "Invalid email or password.";
-        setError(msg);
         toast.error(msg);
       }
     } catch (err: unknown) {
@@ -78,7 +73,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
       } else if (err instanceof Error) {
         msg = err.message;
       }
-      setError(msg);
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -115,13 +109,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          
-          {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-              {error}
-            </div>
-          )}
-
           <TextInput
             label="Email address"
             placeholder="you@gmail.com"
