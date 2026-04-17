@@ -14,7 +14,9 @@ console.log("API URL:", import.meta.env.VITE_BACKEND_URL);
 export const getBooks = async (
   page: number = 1,
   perPage: number = 8,
-  sortByLabel: string = "Highest Rated"
+  sortByLabel: string = "Highest Rated",
+  genre: string = "All",
+  search: string = ""
 ): Promise<BookListResponse> => {
   const sortMap: Record<string, string> = {
     "Most Popular": "most_popular",
@@ -26,7 +28,7 @@ export const getBooks = async (
   const sortByValue = sortMap[sortByLabel] || "highest_rated";
 
   const response = await api.get("/api/v1/books", {
-    params: { page, perPage, sortBy: sortByValue },
+    params: { page, perPage, sortBy: sortByValue, genre, search },
   });
   return response.data;
 };
