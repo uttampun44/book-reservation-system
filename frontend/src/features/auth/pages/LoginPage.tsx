@@ -40,12 +40,6 @@ export function LoginPage() {
     if (name === "password") {
       if (!value) {
         error = "Password is required";
-      } else if (value.length < 6) {
-        error = "Password must be at least 6 characters";
-      } else if (!/[A-Z]/.test(value)) {
-        error = "Include at least one uppercase letter";
-      } else if (!/[0-9]/.test(value)) {
-        error = "Include at least one number";
       }
     }
 
@@ -60,18 +54,24 @@ export function LoginPage() {
 
     setErrors(newErrors);
 
+    const hasError = Object.values(newErrors).some((err) => err);
 
-
-    return true;
+    return !hasError;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
 
     const error = validateField(name, value);
-    setErrors((prev) => ({ ...prev, [name]: error }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+      ...(name === "password" && { password: error }),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,24 +92,20 @@ export function LoginPage() {
           localStorage.setItem("token", response.token);
         }
         login();
-        toast.success("Welcome back! Login successful.");
+        toast.success("Login successful.");
         navigate("/");
       } else {
-        toast.error(response.message || "Invalid email or password.");
+        setErrors((prev) => ({
+          ...prev,
+          password: "Invalid email or password",
+        }));
       }
     } catch (err: unknown) {
-      let msg = "An unexpected error occurred.";
-
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosError = err as {
-          response?: { data?: { message?: string } };
-        };
-        msg = axiosError.response?.data?.message || msg;
-      } else if (err instanceof Error) {
-        msg = err.message;
-      }
-
-      toast.error(msg);
+      console.log(err);
+      setErrors((prev) => ({
+        ...prev,
+        password: "Invalid email or password",
+      }));
     } finally {
       setLoading(false);
     }
@@ -130,7 +126,7 @@ export function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit} noValidate>
-          
+
           <div>
             <TextInput
               label="Email address"

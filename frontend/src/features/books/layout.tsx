@@ -65,7 +65,6 @@ const BookListPageContent: React.FC = () => {
         fetchBooks();
     }, [page, perPage, sortBy]);
 
-    // (Filter & sort) 
     const filteredBooks = useMemo(() => {
         return books?.filter((book) => {
             const matchesSearch =
@@ -127,7 +126,6 @@ const BookListPageContent: React.FC = () => {
                 onSearchChange={handleSearchChange} 
             />
 
-            {/* Global cart drawer — controlled by CartContext */}
             <CartDrawer />
 
             <HeroSection />

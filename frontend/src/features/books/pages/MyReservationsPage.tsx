@@ -10,7 +10,7 @@ const MyReservationsPage: React.FC = () => {
   const { reservedBooks, loading, error, handleUnreserve } = useReservations();
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (
