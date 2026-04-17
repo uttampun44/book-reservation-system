@@ -1,5 +1,5 @@
 import React from "react";
-import { ShoppingBag, Bookmark, BookmarkCheck } from "lucide-react";
+import { ShoppingBag, Bookmark, BookmarkCheck, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
@@ -117,6 +117,12 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             >
               {book.genre}
             </span>
+            <div className="flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm font-bold" style={{ color: "#1a2e1a" }}>
+                {book.rating}
+              </span>
+            </div>
           </div>
 
           <button

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Heart, Loader2, ShoppingBag, Bookmark, BookmarkCheck } from "lucide-react";
+import { ArrowLeft,  Loader2, ShoppingBag, Bookmark, BookmarkCheck } from "lucide-react";
 import { getBookById } from "../api/getBookList";
 import type { Book } from "../types/book";
 import { useReservations } from "../hooks/useReservations";
@@ -205,10 +205,7 @@ const BookDetailsPage: React.FC = () => {
                 {getButtonLabel()}
               </button>
 
-              <button className="px-8 py-4 rounded-xl border-2 border-gray-200 text-gray-600 font-bold flex items-center gap-2 hover:bg-gray-50 transition-all shadow-sm active:scale-95">
-                <Heart className="w-5 h-5" />
-                Wishlist
-              </button>
+
             </div>
           </div>
         </div>

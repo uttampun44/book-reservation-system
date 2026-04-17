@@ -50,7 +50,7 @@ const BookListPageContent: React.FC = () => {
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                const data = await getBooks(page, perPage, sortBy);
+                const data = await getBooks(page, perPage, sortBy, activeGenre, search);
         
                 setBooks(data.data);
                 setPagination(data.pagination);
@@ -63,28 +63,11 @@ const BookListPageContent: React.FC = () => {
         };
 
         fetchBooks();
-    }, [page, perPage, sortBy]);
+    }, [page, perPage, sortBy, activeGenre, search]);
 
     const filteredBooks = useMemo(() => {
-        return books?.filter((book) => {
-            const matchesSearch =
-                book.title.toLowerCase().includes(search.toLowerCase()) ||
-                book.author.toLowerCase().includes(search.toLowerCase()) ||
-                (book.isbn && book.isbn.includes(search));
-
-            const matchesGenre =
-                activeGenre === "All" || book.genre === activeGenre;
-
-            return matchesSearch && matchesGenre;
-        }).sort((a, b) => {
-            switch (sortBy) {
-                case "Highest Rated": return b.rating - a.rating;
-                case "Most Available": return b.available - a.available;
-                case "Title A–Z": return a.title.localeCompare(b.title);
-                default: return b.rating - a.rating;
-            }
-        });
-    }, [books, search, activeGenre, sortBy]);
+        return books;
+    }, [books]);
 
     const totalPages = pagination?.totalPages || 1;
     const hasNextPage = pagination?.hasNextPage || false;
