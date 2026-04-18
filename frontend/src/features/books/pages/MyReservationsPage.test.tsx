@@ -5,7 +5,6 @@ import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
-// Mock the hooks
 vi.mock("../../auth/hooks/useAuth");
 vi.mock("../hooks/useReservations");
 

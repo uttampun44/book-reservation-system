@@ -29,10 +29,12 @@ export interface ReservationRequest {
 
 export interface ReservedItem {
   id?: string;
+  _id?: string;
   userId?: string;
-  bookId: string;
+  bookId?: string;
   reserveDate: string;
   bookDetails?: Book;
+  book?: Book;
 }
 
 export interface ReservationResponse {
@@ -51,7 +53,7 @@ export const reserveBooks = async (
 };
 
 export const getReservedBooks = async (): Promise<ReservationResponse> => {
-  const response = await api.get("/api/v1/reserve-books");
+  const response = await api.get("/api/v1/reserve-books-list");
   return response.data;
 };
 
