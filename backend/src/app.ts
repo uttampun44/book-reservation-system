@@ -15,21 +15,26 @@ import Routes from "@routes/Routes";
 import { corsOptions } from "@config/cors";
 import Cors from "cors";
 import connectDB from "@config/database";
+import { dbReadyMiddleware } from "@/middleware/dbReady.middleware";
 
 export const app: Express = express();
 
 const Port = process.env.PORT || 8080;
 
 app.use(Cors(corsOptions));
-// app.options(/.*/, Cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize database connection
+// Start database connection immediately (but don't wait)
+console.log(chalk.blue("📡 Starting database connection..."));
 connectDB().catch((error) => {
-  console.error(chalk.red("Failed to initialize database:"), error);
+  console.error(chalk.red("⚠️ Initial DB connection failed:"), error);
 });
 
+// Middleware to ensure DB is ready before processing database queries
+app.use(dbReadyMiddleware);
+
+// Set up routes
 app.use("/api/v1/", Routes);
 
 // Global error handler
