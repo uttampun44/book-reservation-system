@@ -15,6 +15,7 @@ import Routes from "@routes/Routes";
 import { corsOptions } from "@config/cors";
 import Cors from "cors";
 import connectDB from "@config/database";
+import { dbMiddleware } from "@/middleware/dbMiddleware";
 
 export const app: Express = express();
 
@@ -24,9 +25,10 @@ app.use(Cors(corsOptions));
 // app.options(/.*/, Cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(dbMiddleware);
 app.use("/api/v1/", Routes);
 
-connectDB();
+// connectDB();
 
 // Only start the server if not in production (Vercel will handle it)
 if (process.env.NODE_ENV !== "production") {

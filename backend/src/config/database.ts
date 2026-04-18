@@ -1,18 +1,31 @@
 import mongoose from "mongoose";
 import { configEnv } from "@config/env";
-import Chalk from 'chalk'
+import chalk from 'chalk';
+
+let isConnected = false; // 👈 cache connection
 
 const connectDB = async () => {
+  if (isConnected) return; // 👈 reuse existing connection
+
+  if (mongoose.connection.readyState === 1) {
+    isConnected = true;
+    return;
+  }
+
   try {
     await mongoose.connect(configEnv.mongoURI, {
       connectTimeoutMS: 10000,
       serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      bufferCommands: false,
     });
-    console.log(Chalk.yellow("Database connected successfully"));
+    isConnected = true;
+    console.log(chalk.yellow("Database connected successfully"));
   } catch (error) {
-    console.error(Chalk.red("Database connection error:", error));
-    // Don't exit - allow the app to serve requests even if DB fails
-    console.log(Chalk.yellow("App will continue running without database connection"));
+    isConnected = false;
+    console.error(chalk.red("Database connection error:"), error);
+    throw error; // 👈 let dbMiddleware catch it
   }
 };
 

@@ -18,6 +18,7 @@ export default defineConfig({
       "@schema": path.resolve(__dirname, "./src/schema"),
       "@types": path.resolve(__dirname, "./src/types"),
       "@data": path.resolve(__dirname, "./src/data"),
+      "@middleware": path.resolve(__dirname, "./src/middleware"),
     },
   },
 });
