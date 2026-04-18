@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { getReservedBooks, reserveBooks, unreserveBook, type ReservedItem } from "../api/reserveBooks";
 import type { Book } from "../types/book";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 export function useReservations() {
   const [reservedBooks, setReservedBooks] = useState<ReservedItem[]>([]);
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,8 +25,10 @@ export function useReservations() {
   }, []);
 
   useEffect(() => {
-    fetchReservations();
-  }, [fetchReservations]);
+    if (isAuthenticated) {
+      fetchReservations();
+    }
+  }, [isAuthenticated, fetchReservations]);
 
   const handleReserve = async (book: Book) => {
     setLoading(true);

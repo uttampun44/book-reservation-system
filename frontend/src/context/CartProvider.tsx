@@ -1,10 +1,12 @@
-import React, { useState, type ReactNode } from 'react';
+import React, { useState, type ReactNode} from 'react';
 import type { Book } from '../features/books/types/book';
 import { CartContext } from './CartContextEntity';
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<Book[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+
 
   const addToCart = (book: Book) => {
     setCartItems(prev => {
