@@ -6,7 +6,7 @@ import { HeroSection } from "./pages/HeroSection";
 import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
-import type { Book, Pagination } from "./types/book";
+import type { Book} from "./types/book";
 import CartDrawer from "./components/ReservationModal";
 
 const BookListPageContent: React.FC = () => {
@@ -20,7 +20,6 @@ const BookListPageContent: React.FC = () => {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [pagination, setPagination] = useState<Pagination | null>(null);
 
     const updateUrlParams = useCallback((newPage: number, newPerPage: number) => {
         setSearchParams({ page: String(newPage), perPage: String(newPerPage) });
@@ -50,10 +49,10 @@ const BookListPageContent: React.FC = () => {
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                const data = await getBooks(page, perPage, sortBy, activeGenre, search);
+                // Fetch a large number of books to handle filtering and pagination on the frontend
+                const data = await getBooks(1, 1000, sortBy, "All");
         
                 setBooks(data.data);
-                setPagination(data.pagination);
             } catch (err) {
                 console.error("Error fetching books:", err);
                 setError("Failed to load books");
@@ -63,15 +62,32 @@ const BookListPageContent: React.FC = () => {
         };
 
         fetchBooks();
-    }, [page, perPage, sortBy, activeGenre, search]);
+    }, [sortBy]);
 
     const filteredBooks = useMemo(() => {
-        return books;
-    }, [books]);
+        return books.filter(book => {
+            const matchesGenre = activeGenre === "All" || book.genre === activeGenre;
+            const matchesSearch = !search || 
+                book.title.toLowerCase().includes(search.toLowerCase()) ||
+                book.author.toLowerCase().includes(search.toLowerCase()) ||
+                book.isbn.includes(search);
+            return matchesGenre && matchesSearch;
+        });
+    }, [books, activeGenre, search]);
 
-    const totalPages = pagination?.totalPages || 1;
-    const hasNextPage = pagination?.hasNextPage || false;
-    const hasPrevPage = pagination?.hasPrevPage || false;
+    const totalItems = filteredBooks.length;
+    const totalPages = Math.ceil(totalItems / perPage) || 1;
+    
+    // Ensure current page doesn't exceed total pages after filtering
+    const currentPage = Math.min(page, totalPages);
+
+    const paginatedBooks = useMemo(() => {
+        const start = (currentPage - 1) * perPage;
+        return filteredBooks.slice(start, start + perPage);
+    }, [filteredBooks, currentPage, perPage]);
+
+    const hasNextPage = currentPage < totalPages;
+    const hasPrevPage = currentPage > 1;
 
     if (loading) {
         return (
@@ -89,7 +105,7 @@ const BookListPageContent: React.FC = () => {
         );
     }
 
-    const safeFilteredBooks = filteredBooks ?? [];
+    const safeFilteredBooks = paginatedBooks ?? [];
 
     return (
         <div
@@ -104,9 +120,9 @@ const BookListPageContent: React.FC = () => {
         ::-webkit-scrollbar-thumb { background: #c8c4b8; border-radius: 3px; }
       `}</style>
 
-            <Navbar 
-                searchValue={search} 
-                onSearchChange={handleSearchChange} 
+            <Navbar
+                searchValue={search}
+                onSearchChange={handleSearchChange}
             />
 
             <CartDrawer />
@@ -125,7 +141,7 @@ const BookListPageContent: React.FC = () => {
             <main className="max-w-7xl mx-auto px-6 py-10">
                 <BookGrid
                     books={safeFilteredBooks}
-                    totalCount={pagination?.totalItems || safeFilteredBooks.length}
+                    totalCount={totalItems}
                     searchQuery={search}
                 />
 
@@ -134,7 +150,7 @@ const BookListPageContent: React.FC = () => {
                         <button
                             onClick={() => {
                                 if (hasPrevPage) {
-                                    const newPage = page - 1;
+                                    const newPage = currentPage - 1;
                                     setPage(newPage);
                                     updateUrlParams(newPage, perPage);
                                 }
@@ -156,7 +172,7 @@ const BookListPageContent: React.FC = () => {
                                     if (
                                         i === 1 ||
                                         i === totalPages ||
-                                        (i >= page - delta && i <= page + delta)
+                                        (i >= currentPage - delta && i <= currentPage + delta)
                                     ) {
                                         range.push(i);
                                     } else if (range[range.length - 1] !== "...") {
@@ -177,9 +193,9 @@ const BookListPageContent: React.FC = () => {
                                             }}
                                             className="w-10 h-10 rounded-md font-medium transition-colors"
                                             style={{
-                                                backgroundColor: page === p ? "#1a2e1a" : "transparent",
-                                                color: page === p ? "#fff" : "#1a2e1a",
-                                                border: page === p ? "none" : "1px solid #c8c4b8"
+                                                backgroundColor: currentPage === p ? "#1a2e1a" : "transparent",
+                                                color: currentPage === p ? "#fff" : "#1a2e1a",
+                                                border: currentPage === p ? "none" : "1px solid #c8c4b8"
                                             }}
                                         >
                                             {p}
@@ -192,7 +208,7 @@ const BookListPageContent: React.FC = () => {
                         <button
                             onClick={() => {
                                 if (hasNextPage) {
-                                    const newPage = page + 1;
+                                    const newPage = currentPage + 1;
                                     setPage(newPage);
                                     updateUrlParams(newPage, perPage);
                                 }

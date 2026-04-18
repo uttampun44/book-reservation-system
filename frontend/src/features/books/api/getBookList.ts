@@ -34,7 +34,6 @@ export const getBooks = async (
 };
 
 export const getBookById = async (id: string): Promise<Book | undefined> => {
-  // Frontend workaround: fetch list and find by ID
   const response = await api.get("/api/v1/books", {
     params: { perPage: 100 }, 
   });

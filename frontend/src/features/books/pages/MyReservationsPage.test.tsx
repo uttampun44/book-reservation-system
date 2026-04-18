@@ -1,58 +1,81 @@
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+import { vi, describe, it, beforeEach, expect } from "vitest";
+
 import MyReservationsPage from "./MyReservationsPage";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useReservations } from "../hooks/useReservations";
-import { vi, describe, it, expect, beforeEach } from "vitest";
 
 vi.mock("../../auth/hooks/useAuth");
 vi.mock("../hooks/useReservations");
 
-const mockReservedBooks = [
-  {
-    id: "res-1",
-    bookId: "book-001",
-    reserveDate: "2024-03-20T10:00:00Z",
-    bookDetails: {
-      title: "The Midnight Library",
-      author: "Matt Haig",
-      coverColor: "#1a3a5c",
-      imageUrl: "mock-url",
-    },
-  },
-  {
-    id: "res-2",
-    bookId: "book-002",
-    reserveDate: "2024-03-21T12:00:00Z",
-    bookDetails: {
-      title: "Atomic Habits",
-      author: "James Clear",
-      coverColor: "#c0392b",
-      imageUrl: "mock-url",
-    },
-  },
-];
+vi.mock("../../../components/layout/Navbar", () => ({
+  default: () => <div>Navbar</div>,
+}));
 
-describe("MyReservationsPage", () => {
+vi.mock("../components/CancelReservationModal", () => ({
+  default: () => <div>Modal</div>,
+}));
+
+describe("MyReservationsPage - list rendering", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-
-
- 
-
-  it("renders a list of reserved books", () => {
+  it("renders reserved books", () => {
+    // mock auth
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
       login: vi.fn(),
       logout: vi.fn(),
     });
+
+    // mock reservations
     vi.mocked(useReservations).mockReturnValue({
-      reservedBooks: mockReservedBooks,
+      reservedBooks: [
+        {
+          id: "1",
+          bookId: "b1",
+          reserveDate: "2024-03-20",
+          book: {
+            id: "b1",
+            title: "Atomic Habits",
+            author: "James Clear",
+            coverColor: "#000",
+            imageUrl: "img",
+
+            genre: "",
+            subGenre: "",
+            publishedYear: 2020,
+            description: "",
+            publisher: "",
+            pages: 100,
+            language: "EN",
+            isbn: "123",
+            rating: 4,
+            reviewCount: 100,
+            price: 10,
+            currency: "USD",
+            inStock: true,
+            available: 5,
+            featured: false,
+            tags: [],
+            coverImage: {
+              small: "img",
+              medium: "img",
+              large: "img", 
+            }
+
+
+          },
+        },
+      ],
       loading: false,
       error: null,
       handleUnreserve: vi.fn(),
+      isBookReserved: vi.fn(),
+      handleReserve: vi.fn(),
+      refreshReservations: vi.fn(),
     });
 
     render(
@@ -61,12 +84,10 @@ describe("MyReservationsPage", () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByTestId("reservations-list")).toBeInTheDocument();
-    expect(screen.getByText("The Midnight Library")).toBeInTheDocument();
+    // assertions
+    expect(screen.getByText("My Reservations")).toBeInTheDocument();
     expect(screen.getByText("Atomic Habits")).toBeInTheDocument();
-    expect(screen.getByText("Matt Haig")).toBeInTheDocument();
     expect(screen.getByText("James Clear")).toBeInTheDocument();
+    expect(screen.getByText("Cancel Reservation")).toBeInTheDocument();
   });
-
-
 });

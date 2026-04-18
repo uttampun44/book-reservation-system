@@ -56,7 +56,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 max-w-md mx-8 bg-white/50 border border-black/5 shadow-inner transition-all focus-within:bg-white focus-within:shadow-md focus-within:border-black/10">
+        <div className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 max-w-md mx-8 bg-white/50 border border-gray-400 shadow-inner transition-all focus-within:bg-white focus-within:shadow-md focus-within:border-black/10">
           <Search className="w-4 h-4 text-gray-400" />
           <input
             className="flex-1 bg-transparent outline-none text-sm text-[#1a2e1a] placeholder-gray-400"
@@ -89,11 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
               >
                 <BookmarkCheck className="w-5 h-5 text-[#1a2e1a] group-hover:scale-110 transition-transform" />
                 <span className="text-sm font-bold text-[#1a2e1a]">Reservations</span>
-                {reservedBooks.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c9a84c] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-[#f5f4f0] animate-in zoom-in duration-300">
-                    {reservedBooks.length}
-                  </span>
-                )}
+           
               </button>
               {!isReservationsPage && (
                 <button 

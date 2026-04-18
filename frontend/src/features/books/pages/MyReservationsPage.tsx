@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Book as BookIcon, Calendar, Trash2, Loader2, Info, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Book as BookIcon, Calendar,  Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Navbar from "../../../components/layout/Navbar";
 import { useReservations } from "../hooks/useReservations";
 import { useAuth } from "../../auth/hooks/useAuth";
 import CancelReservationModal from "../components/CancelReservationModal";
 import type { ReservedItem } from "../api/reserveBooks";
 
-const MyReservationsPage: React.FC = () =>想定
+const MyReservationsPage: React.FC = () =>{
   const { isAuthenticated } = useAuth();
   const { reservedBooks, loading, error, handleUnreserve } = useReservations();
 
@@ -145,9 +145,9 @@ const MyReservationsPage: React.FC = () =>想定
                       onClick={() => handleOpenCancelModal(item)}
                       disabled={loading || isCancelling}
                       className="p-3 rounded-2xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                      title="Unreserve book"
+                      title="Cancel Reservation"
                     >
-                      {loading || isCancelling ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                      Cancel Reservation
                     </button>
                   </div>
 
@@ -156,10 +156,7 @@ const MyReservationsPage: React.FC = () =>想定
                         <Calendar className="w-4 h-4" />
                         <span>Reserved {new Date(item.reserveDate).toLocaleDateString()}</span>
                      </div>
-                     <div className="flex items-center gap-2 text-[#2d6a4f] text-sm font-bold bg-[#f0fdf4] px-3 py-1 rounded-full border border-[#2d6a4f20]">
-                        <Info className="w-4 h-4" />
-                        <span>Pickup within 48h</span>
-                     </div>
+               
                   </div>
                 </div>
 

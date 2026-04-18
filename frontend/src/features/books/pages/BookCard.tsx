@@ -21,7 +21,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 
   const reserved = isBookReserved(book.id);
   const inCart = isInCart(book.id);
-  // const canReserve = book.inStock && !reserved;
   const isOut = !book.inStock;
 
   const handleAction = (e: React.MouseEvent) => {
