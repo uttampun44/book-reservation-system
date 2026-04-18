@@ -50,7 +50,8 @@
       "@models/*": ["src/models/*"],
       "@schema/*": ["src/schema/*"],
       "@types/*": ["src/types/*"],
-        "@utils/*": ["src/utils/*"]
+        "@utils/*": ["src/utils/*"],
+        "@data/*": ["src/data/*"]
     },
   },
   
