@@ -137,7 +137,7 @@ export function RegisterPage() {
           <div>
             <TextInput
               label="Full name"
-              placeholder="John Doe"
+              placeholder="Enter your full name"
               type="text"
               name="fullname"
               value={formData.fullname}
@@ -152,7 +152,7 @@ export function RegisterPage() {
           <div>
             <TextInput
               label="Email address"
-              placeholder="you@gmail.com"
+              placeholder="Enter your email address"
               type="email"
               name="email"
               value={formData.email}

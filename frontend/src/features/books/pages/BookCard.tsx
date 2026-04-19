@@ -1,13 +1,13 @@
-import React from "react";
-import { ShoppingBag, Bookmark, BookmarkCheck, Star } from "lucide-react";
+import React, { useState } from "react";
+import { ShoppingBag, BookmarkCheck, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import type { Book } from "../types/book";
 import AvailabilityBadge from "../../../components/ui/availablityBadge";
 import { useReservations } from "../hooks/useReservations";
 import { useCart } from "../../../context/useCart";
 import { useAuth } from "../../auth/hooks/useAuth";
 import LoginModal from "../../auth/components/LoginModal";
-import { useState } from "react";
 
 interface BookCardProps {
   book: Book;
@@ -15,12 +15,11 @@ interface BookCardProps {
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const { isBookReserved } = useReservations();
-  const { addToCart, removeFromCart, isInCart, setIsCartOpen } = useCart();
+  const { addToCart, setIsCartOpen } = useCart();
   const { isAuthenticated } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const reserved = isBookReserved(book.id);
-  const inCart = isInCart(book.id);
   const isOut = !book.inStock;
 
   const handleAction = (e: React.MouseEvent) => {
@@ -34,33 +33,34 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
       return;
     }
 
-    if (inCart) {
-      removeFromCart(book.id);
-    } else {
-      addToCart(book);
-      setIsCartOpen(true);
+    addToCart(book);
+    setIsCartOpen(true);
+    toast.success(`"${book.title}" added to your list!`);
+  };
+
+  const getButtonConfig = () => {
+    if (reserved) {
+      return {
+        label: "Already Reserved",
+        icon: <BookmarkCheck className="w-4 h-4" />,
+        style: { background: "#f0fdf4", color: "#16a34a", border: "1.5px solid #bbf7d0", cursor: "default" as const }
+      };
     }
+    if (isOut) {
+      return {
+        label: "Unavailable",
+        icon: <ShoppingBag className="w-4 h-4" />,
+        style: { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" as const }
+      };
+    }
+    return {
+      label: "Add to List",
+      icon: <ShoppingBag className="w-4 h-4" />,
+      style: { background: "#1a2e1a", color: "#fff", cursor: "pointer" as const }
+    };
   };
 
-  const getButtonStyle = (): React.CSSProperties => {
-    if (reserved) return { background: "#f0fdf4", color: "#16a34a", border: "1.5px solid #bbf7d0", cursor: "default" };
-    if (isOut)    return { background: "#e8e8e8", color: "#aaa", cursor: "not-allowed" };
-    if (inCart)   return { background: "#fef9ec", color: "#92400e", border: "1.5px solid #fde68a", cursor: "pointer" };
-    return { background: "#1a2e1a", color: "#fff", cursor: "pointer" };
-  };
-
-  const getButtonLabel = () => {
-    if (reserved) return "Already Reserved";
-    if (isOut)    return "Unavailable";
-    if (inCart)   return "Remove from List";
-    return "Add to List";
-  };
-
-  const getButtonIcon = () => {
-    if (reserved) return <BookmarkCheck className="w-4 h-4" />;
-    if (inCart)   return <Bookmark className="w-4 h-4" />;
-    return <ShoppingBag className="w-4 h-4" />;
-  };
+  const { label, icon, style: buttonStyle } = getButtonConfig();
 
   return (
     <>
@@ -74,13 +74,6 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           color: "inherit",
         }}
       >
-        {/* In-cart indicator banner */}
-        {inCart && (
-          <div className="absolute inset-x-0 top-0 bg-[#c9a84c] text-white py-1.5 text-center text-[10px] font-bold z-10 tracking-wide">
-            ✓ In Your List
-          </div>
-        )}
-
         <div
           className="relative h-48 flex items-center justify-center overflow-hidden"
           style={{ backgroundColor: book.coverColor || "#1a2e1a" }}
@@ -98,11 +91,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
 
         <div className="p-4 flex flex-col flex-1 gap-2">
           <div>
-            <h3
-              className="font-bold text-base leading-tight font-lora"
-              style={{ color: "#1a2e1a" }}
-            >
-
+            <h3 className="font-bold text-base leading-tight font-lora" style={{ color: "#1a2e1a" }}>
               {book.title}
             </h3>
             <p className="text-sm mt-0.5" style={{ color: "#6b7c6b" }}>
@@ -129,10 +118,10 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             onClick={handleAction}
             disabled={isOut || reserved}
             className="mt-3 w-full py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 active:scale-95 disabled:active:scale-100 flex items-center justify-center gap-2"
-            style={getButtonStyle()}
+            style={buttonStyle}
           >
-            {getButtonIcon()}
-            {getButtonLabel()}
+            {icon}
+            {label}
           </button>
         </div>
       </Link>

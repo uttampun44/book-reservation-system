@@ -55,7 +55,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
         if (response.token) {
           localStorage.setItem("token", response.token);
         }
-        login();
+        login(formData.email);
         toast.success("Welcome back! Login successful.");
         onClose();
         navigate("/");

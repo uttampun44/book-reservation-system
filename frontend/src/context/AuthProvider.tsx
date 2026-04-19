@@ -7,10 +7,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem("isLoggedIn") === "true";
   });
+  const [userEmail, setUserEmail] = useState<string | null>(() => {
+    return localStorage.getItem("userEmail");
+  });
 
-  const login = () => {
+  const login = (email: string) => {
     localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userEmail", email);
     setIsAuthenticated(true);
+    setUserEmail(email);
   };
 
   const logout = async () => {
@@ -22,12 +27,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("token");
+      localStorage.removeItem("userEmail");
+      // We don't remove "cartItems" here anymore, as they are now keyed by user
       setIsAuthenticated(false);
+      setUserEmail(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userEmail, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

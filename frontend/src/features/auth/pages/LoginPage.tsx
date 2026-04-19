@@ -91,7 +91,7 @@ export function LoginPage() {
         if (response.token) {
           localStorage.setItem("token", response.token);
         }
-        login();
+        login(formData.email);
         toast.success("Login successful.");
         navigate("/");
       } else {
@@ -130,7 +130,7 @@ export function LoginPage() {
           <div>
             <TextInput
               label="Email address"
-              placeholder="you@gmail.com"
+              placeholder="Enter your email address"
               type="email"
               name="email"
               value={formData.email}
