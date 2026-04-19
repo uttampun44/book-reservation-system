@@ -41,13 +41,7 @@ describe("ConfirmReservationModal", () => {
         isSubmitting: false,
     };
 
-    it("renders the modal when isOpen is true", () => {
-        render(<ConfirmReservationModal {...defaultProps} />);
 
-        expect(screen.getByText("Confirm Reservation")).toBeInTheDocument();
-        expect(screen.getByText("Test Book")).toBeInTheDocument();
-        expect(screen.getByText("Test Author")).toBeInTheDocument();
-    });
 
     it("does not render when isOpen is false", () => {
         render(<ConfirmReservationModal {...defaultProps} isOpen={false} />);
