@@ -9,7 +9,7 @@ describe("CancelReservationModal", () => {
         isOpen={true}
         onClose={vi.fn()}
         onConfirm={vi.fn()}
-        item={{ id: "1", reserveDate: "2024-01-01" } as any}
+        item={{ id: "1", reserveDate: "2024-01-01" } }
         isSubmitting={false}
       />
     );
