@@ -23,9 +23,9 @@ describe("MyReservationsPage - list rendering", () => {
   });
 
   it("renders reserved books", () => {
-    // mock auth
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
+      userEmail: "test@example.com",
       login: vi.fn(),
       logout: vi.fn(),
     });
@@ -90,4 +90,4 @@ describe("MyReservationsPage - list rendering", () => {
     expect(screen.getByText("James Clear")).toBeInTheDocument();
     expect(screen.getByText("Cancel Reservation")).toBeInTheDocument();
   });
-});
+})

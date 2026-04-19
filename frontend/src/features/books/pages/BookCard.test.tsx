@@ -61,6 +61,7 @@ describe("BookCard", () => {
     vi.clearAllMocks();
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: true,
+      userEmail: "test@example.com",
       login: vi.fn(),
       logout: vi.fn(),
     });
@@ -101,6 +102,7 @@ describe("BookCard", () => {
   it("opens the login modal instead of adding to cart when user is not authenticated", () => {
     vi.mocked(useAuth).mockReturnValue({
       isAuthenticated: false,
+      userEmail: null,
       login: vi.fn(),
       logout: vi.fn(),
     });
@@ -148,7 +150,7 @@ describe("BookCard", () => {
     const button = screen.getByText("Already Reserved");
     expect(button).toBeInTheDocument();
     expect(button).toBeDisabled();
-    
+
     fireEvent.click(button);
     expect(handleUnreserveMock).not.toHaveBeenCalled();
   });
