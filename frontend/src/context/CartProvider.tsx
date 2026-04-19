@@ -1,12 +1,22 @@
-import React, { useState, type ReactNode} from 'react';
+import React, { useState, useEffect, type ReactNode} from 'react';
 import type { Book } from '../features/books/types/book';
 import { CartContext } from './CartContextEntity';
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<Book[]>([]);
+  const [cartItems, setCartItems] = useState<Book[]>(() => {
+    try {
+      const savedCart = localStorage.getItem('cartItems');
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Failed to load cart items from localStorage:', error);
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (book: Book) => {
     setCartItems(prev => {
