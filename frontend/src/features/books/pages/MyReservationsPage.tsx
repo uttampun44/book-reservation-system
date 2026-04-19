@@ -6,6 +6,7 @@ import { useReservations } from "../hooks/useReservations";
 import { useAuth } from "../../auth/hooks/useAuth";
 import CancelReservationModal from "../components/CancelReservationModal";
 import type { ReservedItem } from "../api/reserveBooks";
+import { toast } from "react-toastify";
 
 const MyReservationsPage: React.FC = () =>{
   const { isAuthenticated } = useAuth();
@@ -16,7 +17,7 @@ const MyReservationsPage: React.FC = () =>{
   const [currentPage, setCurrentPage] = useState(1);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 3;
   const totalPages = Math.ceil(reservedBooks.length / ITEMS_PER_PAGE);
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
@@ -36,13 +37,19 @@ const MyReservationsPage: React.FC = () =>{
     if (!bookId) return;
 
     setIsCancelling(true);
-    await handleUnreserve(bookId);
+    const result = await handleUnreserve(bookId);
     setIsCancelling(false);
-    setIsCancelModalOpen(false);
-    setCancelItem(null);
     
-    if (currentItems.length === 1 && currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+    if (result.success) {
+      toast.success("Reservation cancelled successfully!");
+      setIsCancelModalOpen(false);
+      setCancelItem(null);
+      
+      if (currentItems.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
+    } else {
+      toast.error(result.message || "Failed to cancel reservation");
     }
   };
 
@@ -51,14 +58,11 @@ const MyReservationsPage: React.FC = () =>{
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f4f0]" style={{ fontFamily: "'Inter', sans-serif" }}>
-       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
-      `}</style>
-
+    <div className="min-h-screen bg-[#f5f4f0]">
       <Navbar searchValue="" onSearchChange={() => {}} />
 
-      <main className="max-w-5xl mx-auto px-6 py-12">
+
+      <main className="max-w-5xl  mx-auto px-6 py-12">
         <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
             <Link 
@@ -68,7 +72,7 @@ const MyReservationsPage: React.FC = () =>{
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Browse</span>
             </Link>
-            <h1 className="text-4xl font-black text-[#1a2e1a] font-[Lora]">My Reservations</h1>
+            <h1 className="text-4xl font-black text-[#1a2e1a] font-lora">My Reservations</h1>
             <p className="text-gray-500 mt-2 font-medium">Manage your currently reserved books</p>
           </div>
           
@@ -136,7 +140,7 @@ const MyReservationsPage: React.FC = () =>{
                 <div className="flex-1 flex flex-col py-1">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="text-xl font-bold text-[#1a2e1a] group-hover:text-[#c9a84c] transition-colors font-[Lora]">
+                      <h3 className="text-xl font-bold text-[#1a2e1a] group-hover:text-[#c9a84c] transition-colors font-lora">
                         {item.book?.title || item.bookDetails?.title}
                       </h3>
                       <p className="text-gray-500 font-medium">{item.book?.author || item.bookDetails?.author}</p>

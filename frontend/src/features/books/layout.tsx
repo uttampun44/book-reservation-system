@@ -7,7 +7,7 @@ import FilterBar from "./pages/filterBar";
 import BookGrid from "./pages/BookList";
 import { getBooks } from "./api/getBookList";
 import type { Book} from "./types/book";
-import CartDrawer from "./components/ReservationModal";
+import CartDrawer from "./components/CardDrawer";
 
 const BookListPageContent: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -49,7 +49,6 @@ const BookListPageContent: React.FC = () => {
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                // Fetch a large number of books to handle filtering and pagination on the frontend
                 const data = await getBooks(1, 1000, sortBy, "All");
         
                 setBooks(data.data);
@@ -78,7 +77,6 @@ const BookListPageContent: React.FC = () => {
     const totalItems = filteredBooks.length;
     const totalPages = Math.ceil(totalItems / perPage) || 1;
     
-    // Ensure current page doesn't exceed total pages after filtering
     const currentPage = Math.min(page, totalPages);
 
     const paginatedBooks = useMemo(() => {
@@ -108,17 +106,8 @@ const BookListPageContent: React.FC = () => {
     const safeFilteredBooks = paginatedBooks ?? [];
 
     return (
-        <div
-            className="min-h-screen relative"
-            style={{ background: "#f5f4f0", fontFamily: "'Inter', sans-serif" }}
-        >
-            <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f5f4f0; }
-        ::-webkit-scrollbar-thumb { background: #c8c4b8; border-radius: 3px; }
-      `}</style>
+        <div className="min-h-screen relative bg-[#f5f4f0]">
+
 
             <Navbar
                 searchValue={search}

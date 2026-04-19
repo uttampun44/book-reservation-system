@@ -99,9 +99,10 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
         <div className="p-4 flex flex-col flex-1 gap-2">
           <div>
             <h3
-              className="font-bold text-base leading-tight"
-              style={{ color: "#1a2e1a", fontFamily: "'Lora', Georgia, serif" }}
+              className="font-bold text-base leading-tight font-lora"
+              style={{ color: "#1a2e1a" }}
             >
+
               {book.title}
             </h3>
             <p className="text-sm mt-0.5" style={{ color: "#6b7c6b" }}>

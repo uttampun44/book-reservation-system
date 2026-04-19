@@ -22,9 +22,10 @@ export const HeroSection: React.FC = () => {
           Book Reservation System
         </span>
 
-        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4 text-white font-[Lora]">
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4 text-white font-lora">
           Discover, Reserve & Read
         </h1>
+
 
         <p className="text-lg mb-10 text-white/60">
           Browse 12,000+ titles. Reserve in seconds.

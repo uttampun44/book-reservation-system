@@ -11,5 +11,4 @@ export interface CartContextType {
   setIsCartOpen: (isOpen: boolean) => void;
 }
 
-// Plain context object — no JSX, no component. Safe to export from a .ts file.
 export const CartContext = createContext<CartContextType | undefined>(undefined);

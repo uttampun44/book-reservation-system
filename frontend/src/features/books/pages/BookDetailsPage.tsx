@@ -46,9 +46,10 @@ const BookDetailsPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
         <h2 className="text-2xl font-bold text-[#1a2e1a]">Book not found</h2>
-        <Link to="/" className="text-[#2d6a4f] hover:underline flex items-center gap-2">
+        <Link to="/" onClick={() => setIsCartOpen(false)} className="text-[#2d6a4f] hover:underline flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Browse
         </Link>
+
       </div>
     );
   }
@@ -77,7 +78,7 @@ const BookDetailsPage: React.FC = () => {
     if (reserved) return "Already Reserved";
     if (!book.inStock) return "Unavailable";
     if (inCart) return "Remove from List";
-    return "Add to Reservation List";
+    return "Add to My List";
   };
 
   const getButtonIcon = () => {
@@ -99,11 +100,13 @@ const BookDetailsPage: React.FC = () => {
 
         <Link
           to="/"
+          onClick={() => setIsCartOpen(false)}
           className="inline-flex items-center gap-2 text-[#2d6a4f] font-medium hover:opacity-80 transition-opacity mb-8"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Browse</span>
         </Link>
+
 
         {/* In-cart notice */}
         {inCart && (

@@ -19,7 +19,6 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
 }) => {
   if (!isOpen || !item) return null;
 
-  // Calculate dates based on reserveDate
   const reserveDate = new Date(item.reserveDate);
   const pickupDate = new Date(reserveDate);
   pickupDate.setDate(pickupDate.getDate() + 2);
@@ -36,13 +35,12 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div 
+      <div
         className="w-full max-w-md bg-white rounded-[24px] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
       >
-        {/* Header */}
         <div className="bg-[#1a3b2b] p-6 text-white flex justify-between items-center relative">
           <h2 className="text-xl font-medium">Cancel Reservation</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors absolute right-4 top-4"
           >
@@ -50,7 +48,6 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 pb-8 text-left">
           <p className="text-gray-800 text-[15px] mb-4">
             Please confirm cancellation of your reservation.
@@ -73,12 +70,20 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-4">
+            <button
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1 py-3.5 px-4  border border-gray-300 rounded-xl text-gray-700 font-small hover:bg-gray-50 transition-colors flex items-center justify-center"
+
+            >
+              Back
+            </button>
             <button
               onClick={onConfirm}
               disabled={isSubmitting}
-              className="flex-1 py-3.5 px-4 border border-gray-300 rounded-xl text-gray-700 font-small hover:bg-gray-50 transition-colors flex items-center justify-center"
+              className="flex-2 py-3.5 px-4  text-white bg-[#1a3b2b] rounded-xl font-small hover:bg-[#122a1e] transition-colors"
+
             >
               {isSubmitting ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -86,13 +91,7 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
                 "Confirm Cancellation"
               )}
             </button>
-            <button
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 py-3.5 px-4 bg-[#1a3b2b] text-white rounded-xl font-medium hover:bg-[#122a1e] transition-colors"
-            >
-              Back
-            </button>
+
           </div>
         </div>
       </div>

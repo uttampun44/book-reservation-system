@@ -14,8 +14,8 @@ const BookGrid: React.FC<BookGridProps> = ({ books, totalCount, searchQuery }) =
       <div className="text-center py-24">
         <div className="text-5xl mb-4">📚</div>
         <h3
-          className="text-xl font-bold mb-2"
-          style={{ color: "#1a2e1a", fontFamily: "'Lora', serif" }}
+          className="text-xl font-bold mb-2 font-lora"
+          style={{ color: "#1a2e1a" }}
         >
           No books found
         </h3>
@@ -31,8 +31,8 @@ const BookGrid: React.FC<BookGridProps> = ({ books, totalCount, searchQuery }) =
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2
-            className="text-2xl font-bold"
-            style={{ color: "#1a2e1a", fontFamily: "'Lora', serif" }}
+            className="text-2xl font-bold font-lora"
+            style={{ color: "#1a2e1a" }}
           >
             {searchQuery ? `Results for "${searchQuery}"` : "Available Now"}
           </h2>

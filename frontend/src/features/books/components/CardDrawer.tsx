@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, ShoppingBag, Trash2, CheckCircle, Loader2, ArrowRight } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import type { Book } from "../types/book";
 import { useCart } from "../../../context/useCart";
 import { reserveBooks } from "../api/reserveBooks";
 import { useReservations } from "../hooks/useReservations";
 import { toast } from "react-toastify";
+import ConfirmReservationModal from "./ConfirmReservationModal";
 
 interface ReservationError {
   message: string;
@@ -12,42 +14,53 @@ interface ReservationError {
 }
 
 const CartDrawer: React.FC = () => {
+  const location = useLocation();
   const { cartItems, removeFromCart, clearCart, isCartOpen, setIsCartOpen } = useCart();
   const { refreshReservations } = useReservations();
   const [isLoading, setIsLoading] = useState(false);
   const [reservationError, setReservationError] = useState<ReservationError | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  useEffect(() => {
+    setIsCartOpen(false);
+  }, [location.pathname, setIsCartOpen]);
 
   if (!isCartOpen) return null;
 
-  const handleConfirm = async () => {
+
+  const handleOpenConfirm = () => {
     if (cartItems.length === 0) return;
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleFinalConfirm = async (pickupDate: string) => {
     setIsLoading(true);
     setReservationError(null);
     try {
       const response = await reserveBooks(
         cartItems.map((book) => ({
           bookId: book.id,
-          reserveDate: new Date().toISOString(),
+          reserveDate: pickupDate,
         }))
       );
 
       if (response.success) {
         toast.success("Books reserved successfully!");
-        clearCart();
         setShowSuccess(true);
+        clearCart();
+        setIsConfirmModalOpen(false);
+        setIsCartOpen(false);
         await refreshReservations();
-        setTimeout(() => {
-          setShowSuccess(false);
-          setIsCartOpen(false);
-        }, 2500);
       } else {
+
         const msg = response.message || "Reservation failed. Please try again.";
         toast.error(msg);
         setReservationError({
           message: msg,
           duplicates: response.duplicates || [],
         });
+        setIsConfirmModalOpen(false);
       }
     } catch (err) {
       const apiData = (err as { response?: { data?: { message?: string; duplicates?: string[] } } }).response?.data;
@@ -57,6 +70,7 @@ const CartDrawer: React.FC = () => {
         message: msg,
         duplicates: apiData?.duplicates || [],
       });
+      setIsConfirmModalOpen(false);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +103,7 @@ const CartDrawer: React.FC = () => {
               <ShoppingBag className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-black text-[#1a2e1a] font-[Lora]">Reservation List</h2>
+              <h2 className="text-lg font-black text-[#1a2e1a] font-lora">My List</h2>
               <p className="text-xs text-gray-400 font-medium">
                 {cartItems.length} book{cartItems.length !== 1 ? "s" : ""} selected
               </p>
@@ -111,7 +125,7 @@ const CartDrawer: React.FC = () => {
               <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center border-4 border-green-100">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
-              <h3 className="text-xl font-black text-[#1a2e1a] font-[Lora] text-center">All Reserved!</h3>
+              <h3 className="text-xl font-black text-[#1a2e1a] font-lora text-center">All Reserved!</h3>
               <p className="text-sm text-gray-400 text-center max-w-xs">
                 Your books are reserved for 48 hours. Visit the main desk with your library ID to collect them.
               </p>
@@ -173,7 +187,7 @@ const CartDrawer: React.FC = () => {
                 Clear All
               </button>
               <button
-                onClick={handleConfirm}
+                onClick={handleOpenConfirm}
                 disabled={isLoading}
                 className="flex-1 py-3 rounded-2xl bg-[#1a2e1a] text-white font-bold text-sm shadow-lg shadow-black/10 hover:opacity-95 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-80"
               >
@@ -193,6 +207,14 @@ const CartDrawer: React.FC = () => {
           </div>
         )}
       </div>
+
+      <ConfirmReservationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleFinalConfirm}
+        books={cartItems}
+        isSubmitting={isLoading}
+      />
 
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
@@ -262,3 +284,4 @@ const CartItem: React.FC<CartItemProps> = ({ book, onRemove, disabled, isDuplica
 );
 
 export default CartDrawer;
+

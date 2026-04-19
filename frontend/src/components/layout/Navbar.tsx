@@ -51,10 +51,12 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
               />
             </svg>
           </div>
-          <span className="font-bold text-xl tracking-tight text-[#1a2e1a] font-[Lora]">
+          <span className="font-bold text-xl tracking-tight text-[#1a2e1a] font-lora">
             BookLib
           </span>
+
         </div>
+              {!isReservationsPage && (
 
         <div className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-full flex-1 max-w-md mx-8 bg-white/50 border border-gray-400 shadow-inner transition-all focus-within:bg-white focus-within:shadow-md focus-within:border-black/10">
           <Search className="w-4 h-4 text-gray-400" />
@@ -73,6 +75,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
             </button>
           )}
         </div>
+              )}
 
         <div className="hidden md:flex items-center gap-4">
           {isAuthenticated && (
@@ -117,7 +120,7 @@ const Navbar: React.FC<NavbarProps> = ({ searchValue, onSearchChange }) => {
               </div>
               <button 
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="text-xs font-bold text-gray-400 hover:text-red-500 transition-colors pr-1"
+                className="text-sm font-bold text-gray-400 hover:text-red-500 transition-colors pr-1"
               >
                 Log out
               </button>
