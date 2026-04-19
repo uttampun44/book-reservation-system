@@ -100,3 +100,4 @@ const CancelReservationModal: React.FC<CancelReservationModalProps> = ({
 };
 
 export default CancelReservationModal;
+
