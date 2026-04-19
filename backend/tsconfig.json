@@ -51,7 +51,8 @@
       "@schema/*": ["src/schema/*"],
       "@types/*": ["src/types/*"],
         "@utils/*": ["src/utils/*"],
-        "@data/*": ["src/data/*"]
+        "@data/*": ["src/data/*"],
+        "@middleware/*": ["src/middleware/*"]
     },
   },
   

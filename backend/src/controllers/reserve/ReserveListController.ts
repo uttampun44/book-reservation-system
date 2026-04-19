@@ -35,9 +35,12 @@ export const ReserveListController = async (req: Request, res: Response) => {
         data: reservesWithBooks,
     });
   } catch (error) {
+    console.error("Error in ReserveListController:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return res.status(500).json({
       success: false,
-        message: "An error occurred while retrieving reserved books",
+      message: "An error occurred while retrieving reserved books",
+      error: process.env.NODE_ENV === "development" ? errorMessage : undefined,
     });
-    }   
+  }
 };

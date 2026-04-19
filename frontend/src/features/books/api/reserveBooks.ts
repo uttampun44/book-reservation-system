@@ -3,7 +3,7 @@ import type { Book } from "../types/book";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL || "http://localhost:8000",
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
