@@ -8,41 +8,43 @@ interface BookGridProps {
   searchQuery: string;
 }
 
+const NoBooksFound: React.FC = () => (
+  <div className="text-center py-24">
+    <div className="text-5xl mb-4">📚</div>
+    <h3 className="text-xl font-bold mb-2 font-lora text-green-900">
+      No books found
+    </h3>
+    <p className="text-sm text-gray-500">
+      Try a different search term or genre filter
+    </p>
+  </div>
+);
+
+const BookListHeader: React.FC<{ searchQuery: string; booksLength: number; totalCount: number }> = ({
+  searchQuery,
+  booksLength,
+  totalCount,
+}) => (
+  <div className="flex items-center justify-between mb-6">
+    <div>
+      <h2 className="text-2xl font-bold font-lora text-green-900">
+        {searchQuery ? `Results for "${searchQuery}"` : "Available Now"}
+      </h2>
+      <p className="text-sm mt-1 text-gray-500">
+        Showing {booksLength} of {totalCount} results
+      </p>
+    </div>
+  </div>
+);
+
 const BookGrid: React.FC<BookGridProps> = ({ books, totalCount, searchQuery }) => {
   if (books.length === 0) {
-    return (
-      <div className="text-center py-24">
-        <div className="text-5xl mb-4">📚</div>
-        <h3
-          className="text-xl font-bold mb-2 font-lora"
-          style={{ color: "#1a2e1a" }}
-        >
-          No books found
-        </h3>
-        <p className="text-sm" style={{ color: "#888" }}>
-          Try a different search term or genre filter
-        </p>
-      </div>
-    );
+    return <NoBooksFound />;
   }
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2
-            className="text-2xl font-bold font-lora"
-            style={{ color: "#1a2e1a" }}
-          >
-            {searchQuery ? `Results for "${searchQuery}"` : "Available Now"}
-          </h2>
-          <p className="text-sm mt-1" style={{ color: "#888" }}>
-            Showing {books.length} of {totalCount} results
-          </p>
-        </div>
-       
-      </div>
-
+      <BookListHeader searchQuery={searchQuery} booksLength={books.length} totalCount={totalCount} />
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
         {books.map((book) => (
           <BookCard key={book.id} book={book} />
