@@ -29,20 +29,23 @@ export function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const validateField = (name: string, value: string, data = formData): string => {
+    const trimmedValue = value.trim();
+
     switch (name) {
       case "fullname":
-        if (!value) return "Full name is required";
-        if (value.trim().length < 2) return "Full name must be at least 2 characters";
+        if (!trimmedValue) return "Full name is required";
+        if (trimmedValue.length < 2) return "Full name must be at least 2 characters";
         return "";
 
       case "email":
-        if (!value) return "Email is required";
-        if (!/\S+@\S+\.\S+/.test(value)) return "Enter a valid email address";
+        if (!trimmedValue) return "Email is required";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue))
+          return "Enter a valid email address";
         return "";
 
       case "password":
         if (!value) return "Password is required";
-        if (value.length < 6) return "Minimum 6 characters required";
+        if (value.length < 6) return "Minimum 8 characters required";
         if (!/[A-Z]/.test(value)) return "At least one uppercase letter required";
         if (!/\d/.test(value)) return "At least one number required";
         if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
@@ -68,10 +71,7 @@ export function RegisterPage() {
     };
 
     setErrors(newErrors);
-
-
-
-    return true;
+    return !Object.values(newErrors).some((error) => error !== "");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
