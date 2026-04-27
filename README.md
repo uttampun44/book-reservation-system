@@ -19,7 +19,7 @@ The project was developed as part of the **Advanced Topics in Software Engineeri
 | **Sagun** | Scrum Master | Jira management, sprint planning, stand‑ups, retrospectives, report coordination |
 | **Alisha** | Product Owner / UX | User stories, wireframes, acceptance criteria, prototype verification |
 | **Uttam** | DevOps / Backend | CI/CD, testing, backend logic, deployment |
-| **Indra** | Frontend | HTML/CSS, UI components, frontend implementation |
+| **Indra** | Frontend | ReactJS, TypeScript, UI components, frontend implementation |
 
 ## Three Prototypes (Sprints)
 
@@ -31,7 +31,7 @@ The project was developed as part of the **Advanced Topics in Software Engineeri
 
 ## Technology Stack
 
-- **Frontend**: React.Js, Typescript, TailwindCSS
+- **Frontend**: React.js, Typescript, TailwindCSS
 - **Backend (mock)**: MongoDB, Node.Js and Express.Js
 - **Version Control**: Git & GitHub
 - **CI/CD**: GitHub Actions (automated tests) + Netlify (automatic deployment)
